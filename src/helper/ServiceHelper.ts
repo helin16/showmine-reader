@@ -1,0 +1,10 @@
+export const OP_AND = 'OP_AND';
+export const OP_OR = 'OP_OR';
+export const OP_LIKE = 'OP_LIKE';
+export const OP_EQ = 'OP_EQ';
+export const OP_GTE = 'OP_GTE';
+export const OP_GT = 'OP_GT';
+export const OP_LT = 'OP_LT';
+export const OP_LTE = 'OP_LTE';
+export const OP_NOT = 'OP_NOT';
+export const OP_BETWEEN = 'OP_BETWEEN';

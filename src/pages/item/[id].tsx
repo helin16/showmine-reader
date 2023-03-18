@@ -2,7 +2,9 @@ import Page from '../../components/Page';
 import Header from '../../components/Header';
 import ItemService from '@/serivices/ItemService';
 import Page404 from '@/components/Page404';
-import ArticleDetails from '@/components/ArticleDetails';
+import ArticleDetails from '@/components/Article/ArticleDetails';
+import ItemListUnderCompany from '@/components/Item/ItemListUnderCompany';
+import ArticleFooter from '@/components/Article/ArticleFooter';
 
 const ItemDetailsPage = ({ item }: any) => {
   const getContent = () => {
@@ -19,7 +21,12 @@ const ItemDetailsPage = ({ item }: any) => {
         />
       );
     }
-    return <ArticleDetails item={item} />;
+    return (
+      <>
+        <ArticleDetails item={item} />
+        <ArticleFooter company={item.Company} />
+      </>
+    );
   };
 
   return (

@@ -1,6 +1,7 @@
 import iBaseType from './iBaseType';
 import iAuthor from '@/types/iAuthor';
 import iCompany from '@/types/iCompany';
+import iAsset from '@/types/iAsset';
 
 type iItem = iBaseType & {
   title: string;
@@ -15,6 +16,7 @@ type iItem = iBaseType & {
   publishedAt?: Date | null;
   publishedById?: string | null;
   Company?: iCompany;
-}
+  CoverAsset?: iAsset;
+};
 
 export default iItem;

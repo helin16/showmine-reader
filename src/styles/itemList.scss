@@ -1,0 +1,43 @@
+@import 'variables';
+
+$coverImgWidth: 12vw;
+
+.item-list-wrapper {
+  .item-list {
+    .item {
+      display: flex;
+      gap: 1rem;
+      font-size: $fontSize - 2px;
+      padding: 0.8rem 0px;
+
+      .cover-img {
+        width: $coverImgWidth;
+        min-width: $coverImgWidth;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        cursor: pointer;
+        min-height: $coverImgWidth / 2;
+      }
+      .info {
+        flex: auto;
+        max-width: calc($pageMaxWidth - $coverImgWidth);
+        @media only screen and (max-width: 600px) {
+          max-width: calc(100vw - $coverImgWidth - 4rem);
+        }
+        .title {
+          cursor: pointer;
+        }
+        .date {
+          margin-top: 4px;
+          font-size: $fontSize - 4px;
+          color: $textMutedColor;
+        }
+        .excerpt {
+          font-size: $fontSize - 4px;
+          color: $textMutedColor;
+        }
+      }
+    }
+  }
+}

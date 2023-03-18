@@ -1,5 +1,4 @@
 import iItem from '@/types/iItem';
-import ArticleFooter from '@/components/ArticleFooter';
 import moment from 'moment';
 
 type iArticleDetails = {
@@ -35,6 +34,19 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     );
   };
 
+  const getItemFooter = () => {
+    const footerString = `${item.Company?.itemDefaultFooter || ''}`.trim();
+    if (footerString === '') {
+      return null;
+    }
+    return (
+      <div
+        className={'default-footer margin-bottom-md'}
+        dangerouslySetInnerHTML={{ __html: footerString }}
+      />
+    );
+  };
+
   return (
     <div className={'article-details-wrapper'}>
       <div className={'header margin-bottom-md'}>
@@ -58,13 +70,8 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
         <div className={'article-end text-muted text-center'}>
           <small>- END -</small>
         </div>
-        {/*// @ts-ignore*/}
-        <div
-          className={'default-footer margin-bottom-md'}
-          dangerouslySetInnerHTML={{ __html: item.itemDefaultFooter || '' }}
-        />
+        {getItemFooter()}
       </div>
-      <ArticleFooter company={item.Company} />
     </div>
   );
 };

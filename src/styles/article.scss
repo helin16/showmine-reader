@@ -20,6 +20,7 @@ $logoWidth: 15vw;
     }
     .info {
       display: flex;
+      font-size: $fontSize - 4px;
       justify-content: space-between;
       .left {
         display: flex;
@@ -28,40 +29,40 @@ $logoWidth: 15vw;
       }
     }
   }
+}
 
-  .article-footer-wrapper {
-    margin-top: 3rem;
+.article-footer-wrapper {
+  margin-top: 3rem;
 
-    .company-info {
-      display: flex;
-      gap: 1rem;
-      .logo-wrapper {
-        background-color: #ececec;
-        width: $logoWidth;
-        min-width: 120px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center center;
+  .company-info {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0px;
+    .logo-wrapper {
+      background-color: #ececec;
+      width: $logoWidth;
+      min-width: 120px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+    .info {
+      padding: 0.4rem;
+      .name {
+        font-weight: 500;
+        font-size: $fontSize + 3px;
       }
-      .info {
-        padding: 0.4rem;
-        .name {
-          font-weight: 500;
-          font-size: $fontSize + 3px;
+      .contact-row {
+        padding: 1.1rem 0 0.9rem 0;
+      }
+      .description {
+        max-width: calc($pageMaxWidth - $logoWidth);
+        @media only screen and (max-width: 600px) {
+          max-width: calc(100vw - 25vw - 4rem);
         }
-        .contact-row {
-          padding: 1.1rem 0 0.9rem 0;
-
-        }
-        .description {
-          max-width: calc($pageMaxWidth - $logoWidth);
-          @media only screen and (max-width: 600px) {
-            max-width: calc(100vw - 25vw - 4rem);
-          }
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }

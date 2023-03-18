@@ -1,10 +1,13 @@
-import axios, {AxiosRequestConfig} from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import LocalStorageService from './LocalStorageService';
 
+const getHeaderCompanyIdName = () => {
+  return `${process.env.NEXT_PUBLIC_HEADER_NAME_COMPANY_ID || 'comid'}`;
+};
 
 const getHeaderAppTokenName = () => {
-  return `${process.env.NEXT_PUBLIC_HEADER_NAME_APP_TOKEN || 'X-SHM-TOKEN'}`
-}
+  return `${process.env.NEXT_PUBLIC_HEADER_NAME_APP_TOKEN || 'X-SHM-TOKEN'}`;
+};
 export type iConfigParams = {
   [key: string]: any;
 };
@@ -18,13 +21,14 @@ const getEndPointUrl = (url: string) => {
 
 const getHeaders = (extra = {}) => {
   const token = LocalStorageService.getToken();
-  const authHeader = (!token || token === '') ? {} : {Authorization: `Bearer ${token}`};
+  const authHeader =
+    !token || token === '' ? {} : { Authorization: `Bearer ${token}` };
   return {
     headers: {
       [getHeaderAppTokenName()]: `${process.env.NEXT_PUBLIC_APP_TOKEN || ''}`,
       ...authHeader,
-      ...extra,
-    },
+      ...extra
+    }
   };
 };
 
@@ -36,19 +40,27 @@ const getUrlParams = (params: iConfigParams = {}) => {
   return paramString === '' ? '' : `?${paramString}`;
 };
 
-const get = (url: string, params: iConfigParams = {}, config: AxiosRequestConfig = {}) => {
-  const {headers, ...rest} = config;
+const get = (
+  url: string,
+  params: iConfigParams = {},
+  config: AxiosRequestConfig = {}
+) => {
+  const { headers, ...rest } = config;
   return axios.get(
     `${getEndPointUrl(url)}${getUrlParams(params)}`,
     // @ts-ignore
     {
       ...rest,
       ...getHeaders(headers)
-    },
+    }
   );
 };
 
-const post = (url: string, params: iParams, config: AxiosRequestConfig = {}) => {
+const post = (
+  url: string,
+  params: iParams,
+  config: AxiosRequestConfig = {}
+) => {
   // @ts-ignore
   return axios.post(getEndPointUrl(url), params, {
     ...config,
@@ -56,7 +68,11 @@ const post = (url: string, params: iParams, config: AxiosRequestConfig = {}) => 
   });
 };
 
-const put = (url: string, params: iConfigParams, config: AxiosRequestConfig = {}) => {
+const put = (
+  url: string,
+  params: iConfigParams,
+  config: AxiosRequestConfig = {}
+) => {
   // @ts-ignore
   return axios.put(getEndPointUrl(url), params, {
     ...config,
@@ -64,7 +80,11 @@ const put = (url: string, params: iConfigParams, config: AxiosRequestConfig = {}
   });
 };
 
-const remove = (url: string, params: iConfigParams = {}, config: AxiosRequestConfig = {}) => {
+const remove = (
+  url: string,
+  params: iConfigParams = {},
+  config: AxiosRequestConfig = {}
+) => {
   return axios.delete(
     `${getEndPointUrl(url)}${getUrlParams(params)}`,
     // @ts-ignore
@@ -79,11 +99,15 @@ const getUploadHeaders = () => {
   return {
     headers: {
       ...headers,
-      'Content-Type': 'multipart/form-data',
-    },
+      'Content-Type': 'multipart/form-data'
+    }
   };
 };
-const uploadImage = (url: string, params: FormData, config: AxiosRequestConfig = {}) => {
+const uploadImage = (
+  url: string,
+  params: FormData,
+  config: AxiosRequestConfig = {}
+) => {
   // @ts-ignore
   return axios.post(getEndPointUrl(url), params, {
     ...config,
@@ -92,11 +116,13 @@ const uploadImage = (url: string, params: FormData, config: AxiosRequestConfig =
 };
 
 const AppService = {
+  getHeaderCompanyIdName,
+  getHeaderAppTokenName,
   get,
   post,
   put,
   delete: remove,
-  uploadImage,
+  uploadImage
 };
 
 export default AppService;
