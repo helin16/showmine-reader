@@ -1,4 +1,6 @@
 import iItem from '@/types/iItem';
+import ArticleFooter from '@/components/ArticleFooter';
+import moment from 'moment';
 
 type iArticleDetails = {
   item: iItem;
@@ -17,15 +19,26 @@ const ArticleDetails = ({item}: iArticleDetails) => {
     <div className={'article-details-wrapper'}>
       <div className={'header margin-bottom-md'}>
         <div className={'title'}>{item.title}</div>
-        <div>
-          <a className={'text-muted padding-around-sm'} href={getAuthorUrl()}>{item.Author?.name}</a>
+        <div className={'info'}>
+          <div className={'left'}>
+            <a className={'author'} href={getAuthorUrl()}>{item.Author?.name}</a>
+            <div className={'text-muted'}>{moment(item.publishedAt).format('YYYY-MM-DD HH:mm')}</div>
+          </div>
+          <div className={'right text-muted'}>
+            阅读: {item.noOfVisits}
+          </div>
         </div>
       </div>
-      {/*// @ts-ignore*/}
-      <div className={'content margin-bottom-md'} dangerouslySetInnerHTML={{ __html: item.content }} />
-      <div className={'article-end text-muted text-center'}>
-        <small>The End - 文章底部</small>
+      <div className={'content-wrapper'}>
+        {/*// @ts-ignore*/}
+        <div className={'content margin-bottom-md'} dangerouslySetInnerHTML={{ __html: item.content || '' }} />
+        <div className={'article-end text-muted text-center'}>
+          <small>- END -</small>
+        </div>
+        {/*// @ts-ignore*/}
+        <div className={'default-footer margin-bottom-md'} dangerouslySetInnerHTML={{ __html: item.itemDefaultFooter || '' }} />
       </div>
+      <ArticleFooter company={item.Company} />
     </div>
   );
 }

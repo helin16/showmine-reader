@@ -1,11 +1,18 @@
+@import 'variables';
+
 body {
     margin: 0px;
     min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
+    font-size: $fontSize;
+}
+
+a {
+    text-decoration: none;
 }
 
 .text-muted {
-    color: #888;
+    color: $textMutedColor;
 }
 
 .text-center {
@@ -21,7 +28,7 @@ body {
 }
 
 .page-wrapper {
-    max-width: 800px !important;
+    max-width: $pageMaxWidth !important;
     margin: 0px auto;
     padding: 1rem;
 }
@@ -56,23 +63,4 @@ body {
 .weui-btn.weui-btn_primary {
     background-color: #07c160;
     color: white;
-}
-
-
-.article-details-wrapper {
-
-}
-
-.article-details-wrapper img {
-    width: 100%;
-    height: auto;
-}
-
-.article-details-wrapper .title {
-    font-size: 18px;
-    margin-bottom: 1rem;
-}
-
-.article-details-wrapper .article-end {
-
 }

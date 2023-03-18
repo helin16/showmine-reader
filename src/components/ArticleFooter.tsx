@@ -1,31 +1,56 @@
-import iItem from '@/types/iItem';
+import iCompany from '@/types/iCompany';
+import {defaultLogoUrl} from '@/components/DefaultIcon';
+import Utils from '@/serivices/Utils';
 
-type iArticleDetails = {
-  item: iItem;
+type iArticleFooter = {
+  company?: iCompany;
 }
 
-const ArticleDetails = ({item}: iArticleDetails) => {
-  const getAuthorUrl = () => {
-    const pattern = /^((http|https|ftp):\/\/)/;
-    const url = `${item.Author?.url || ''}`.trim();
-    if(pattern.test(url)) {
-      return url;
+const ArticleFooter = ({company}: iArticleFooter) => {
+
+  const getLogoUrl = () => {
+    const logoUrl = `${company?.LogoAsset?.url || ''}`.trim();
+    if (logoUrl === '') {
+      return defaultLogoUrl;
     }
-    return `http://${url}`;
+    return logoUrl
   }
+
+  const getWebSite = () => {
+    const url = `${company?.websiteUrl || ''}`.trim();
+    if (url === '') {
+      return null;
+    }
+    return <a className={'website'} href={url}>Web: {url}</a>
+  }
+  const getTel = () => {
+    const contactNo = `${company?.contactNumber || ''}`.trim();
+    if (contactNo === '') {
+      return null;
+    }
+    return <a className={'contact-number'} href={`tel:${contactNo}`}>Tel: {contactNo}</a>
+  }
+
+  if (!company) {
+    return null;
+  }
+
   return (
-    <div className={'article-details-wrapper'}>
-      <div className={'header margin-bottom-md'}>
-        <div className={'title'}>{item.title}</div>
-        <div>
-          <a className={'text-muted padding-around-sm'} href={getAuthorUrl()}>{item.Author?.name}</a>
+    <div className={'article-footer-wrapper'}>
+      <div className={'company-info'}>
+        <div className={'logo-wrapper'} style={{backgroundImage: `url(${getLogoUrl()})`}}>
         </div>
-      </div>
-      {/*// @ts-ignore*/}
-      <div className={'content margin-bottom-md'} dangerouslySetInnerHTML={{ __html: item.content }}>
+        <div className={'info'}>
+          <div className={'name'}>{company.name}</div>
+          <div className={'contact-row'}>
+            {getTel()}
+            {getWebSite()}
+          </div>
+          <div className={'description text-muted'}>{Utils.stripHTMLTags(company.description || '')}</div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default ArticleDetails;
+export default ArticleFooter;

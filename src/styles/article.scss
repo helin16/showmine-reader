@@ -1,0 +1,65 @@
+@import 'variables';
+
+$logoWidth: 15vw;
+
+.article-details-wrapper {
+
+  .content-wrapper {
+    line-height: 2;
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+    .title {
+      font-size: 20px;
+      margin-bottom: 0.4rem;
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      .left {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+      }
+    }
+  }
+
+  .article-footer-wrapper {
+    margin-top: 3rem;
+
+    .company-info {
+      display: flex;
+      gap: 1rem;
+      .logo-wrapper {
+        background-color: #ececec;
+        width: $logoWidth;
+        min-width: 120px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
+      .info {
+        padding: 0.4rem;
+        .name {
+          font-weight: 500;
+          font-size: $fontSize + 3px;
+        }
+        .contact-row {
+          padding: 1.1rem 0 0.9rem 0;
+
+        }
+        .description {
+          width: calc($pageMaxWidth - $logoWidth);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}

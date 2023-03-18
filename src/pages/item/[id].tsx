@@ -15,9 +15,6 @@ const ItemDetailsPage = ({item}: any) => {
   return (
     <Page header={<Header title={item?.title} description={item?.description}/>}>
       <div>{getContent()}</div>
-      <div>
-      <pre>{JSON.stringify(item.Company)}</pre>
-      </div>
     </Page>
   )
 }
@@ -27,7 +24,7 @@ export const getServerSideProps = async ({params}: any) => {
   let item = undefined;
   try {
     item = await ItemService.getItemById(id, {
-      include: 'Author,Company'
+      include: 'Author,Company.LogoAsset'
     });
   } catch (err) {
     console.error(err);
