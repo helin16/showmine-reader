@@ -22,7 +22,7 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     }
     WeChatService.runWhenWXReady()
       .then(xw => {
-        xw.shareOnChat({
+        xw.updateAppMessageShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
@@ -31,7 +31,7 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
           // success: () => {},
           // cancel: () => {}
         });
-        xw.shareOnMoment({
+        xw.updateTimelineShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
