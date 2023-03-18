@@ -9,6 +9,12 @@ const ItemDetailsPage = ({item}: any) => {
     if (item === undefined) {
       return <Page404 />
     }
+    if (item.isPublished !== true) {
+      return <Page404
+        title={'Item Not Available 文章无法访问'}
+        description={'Visiting item is not Available. 文章可能是还没有被发布或者已下架。'}
+      />
+    }
     return <ArticleDetails item={item} />
   }
 

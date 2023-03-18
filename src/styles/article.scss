@@ -54,7 +54,10 @@ $logoWidth: 15vw;
 
         }
         .description {
-          width: calc($pageMaxWidth - $logoWidth);
+          max-width: calc($pageMaxWidth - $logoWidth);
+          @media only screen and (max-width: 600px) {
+            max-width: calc(100vw - 25vw - 4rem);
+          }
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
