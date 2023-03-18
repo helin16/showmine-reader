@@ -4,43 +4,69 @@ import moment from 'moment';
 
 type iArticleDetails = {
   item: iItem;
-}
+};
 
-const ArticleDetails = ({item}: iArticleDetails) => {
+const ArticleDetails = ({ item }: iArticleDetails) => {
   const getAuthorUrl = () => {
-    const pattern = /^((http|https|ftp):\/\/)/;
     const url = `${item.Author?.url || ''}`.trim();
-    if(pattern.test(url)) {
+    if (url === '') {
+      return '';
+    }
+    const pattern = /^((http|https|ftp):\/\/)/;
+    if (pattern.test(url)) {
       return url;
     }
     return `http://${url}`;
-  }
+  };
+
+  const getAuthorDiv = () => {
+    const authorName = `${item.Author?.name || ''}`.trim();
+    if (authorName === '') {
+      return null;
+    }
+    const authorUrl = getAuthorUrl();
+    if (authorUrl === '') {
+      return <span className={'author'}>{authorName}</span>;
+    }
+    return (
+      <a className={'author'} href={authorUrl}>
+        {item.Author?.name}
+      </a>
+    );
+  };
+
   return (
     <div className={'article-details-wrapper'}>
       <div className={'header margin-bottom-md'}>
         <div className={'title'}>{item.title}</div>
         <div className={'info'}>
           <div className={'left'}>
-            <a className={'author'} href={getAuthorUrl()}>{item.Author?.name}</a>
-            <div className={'text-muted'}>{moment(item.publishedAt).format('YYYY-MM-DD HH:mm')}</div>
+            {getAuthorDiv()}
+            <div className={'text-muted'}>
+              {moment(item.publishedAt).format('YYYY-MM-DD HH:mm')}
+            </div>
           </div>
-          <div className={'right text-muted'}>
-            阅读: {item.noOfVisits}
-          </div>
+          <div className={'right text-muted'}>阅读: {item.noOfVisits}</div>
         </div>
       </div>
       <div className={'content-wrapper'}>
         {/*// @ts-ignore*/}
-        <div className={'content margin-bottom-md'} dangerouslySetInnerHTML={{ __html: item.content || '' }} />
+        <div
+          className={'content margin-bottom-md'}
+          dangerouslySetInnerHTML={{ __html: item.content || '' }}
+        />
         <div className={'article-end text-muted text-center'}>
           <small>- END -</small>
         </div>
         {/*// @ts-ignore*/}
-        <div className={'default-footer margin-bottom-md'} dangerouslySetInnerHTML={{ __html: item.itemDefaultFooter || '' }} />
+        <div
+          className={'default-footer margin-bottom-md'}
+          dangerouslySetInnerHTML={{ __html: item.itemDefaultFooter || '' }}
+        />
       </div>
       <ArticleFooter company={item.Company} />
     </div>
   );
-}
+};
 
 export default ArticleDetails;
