@@ -24,9 +24,6 @@ const getWX = async () => {
         'checkJsApi',
         'onMenuShareTimeline',
         'onMenuShareAppMessage',
-        'onMenuShareQQ',
-        'onMenuShareWeibo',
-        'onMenuShareQZone',
         'hideMenuItems',
         'showMenuItems',
         'hideAllNonBaseMenuItem',
@@ -52,11 +49,7 @@ const getWX = async () => {
         'showOptionMenu',
         'closeWindow',
         'scanQRCode',
-        'chooseWXPay',
-        'openProductSpecificView',
-        'addCard',
-        'chooseCard',
-        'openCard'
+        'chooseWXPay'
       ]
     });
   }
