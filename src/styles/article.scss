@@ -5,7 +5,7 @@ $logoWidth: 15vw;
 .article-details-wrapper {
 
   .content-wrapper {
-    line-height: 1.85rem;
+    line-height: 1.9rem;
     img {
       width: 100%;
       height: auto;
@@ -15,7 +15,7 @@ $logoWidth: 15vw;
   .header {
     margin-bottom: 1rem;
     .title {
-      font-size: 20px;
+      font-size: $fontSize + 4px;
       margin: 1rem 0;
     }
     .info {
