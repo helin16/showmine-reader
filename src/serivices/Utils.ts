@@ -7,6 +7,8 @@ const stripHTMLTags = (htmlString: string): string => {
   return div.textContent || div.innerText || '';
 };
 
-export default {
+const Utils = {
   stripHTMLTags,
 };
+
+export default Utils;

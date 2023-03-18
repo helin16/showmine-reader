@@ -6,6 +6,8 @@ const getItemById = async (id: string, params?: iConfigParams, config?: iConfigP
   return AppService.get(`${endPoint}/${id}`, params, config).then(resp => resp.data);
 }
 
-export default {
+const ItemService = {
   getItemById
 }
+
+export default ItemService;
