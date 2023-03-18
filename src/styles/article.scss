@@ -33,6 +33,7 @@ $logoWidth: 15vw;
 
 .article-footer-wrapper {
   margin-top: 3rem;
+  margin-bottom: 3rem;
 
   .company-info {
     display: flex;
@@ -48,12 +49,17 @@ $logoWidth: 15vw;
     }
     .info {
       padding: 0.4rem;
+      justify-items: flex-end;
       .name {
         font-weight: 500;
         font-size: $fontSize + 3px;
+        margin-bottom: 1rem;
       }
       .contact-row {
-        padding: 1.1rem 0 0.9rem 0;
+        font-size: $fontSize - 2px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
       }
       .description {
         max-width: calc($pageMaxWidth - $logoWidth);
@@ -63,6 +69,7 @@ $logoWidth: 15vw;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: $fontSize - 2px;
       }
     }
   }

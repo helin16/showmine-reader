@@ -6,6 +6,7 @@ import Spinner from '@/components/Spinner';
 import { OP_LT, OP_NOT } from '@/helper/ServiceHelper';
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import Utils from '@/serivices/Utils';
 
 type iItemListUnderCompany = {
   companyId?: string;
@@ -60,14 +61,6 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
     setPageNo(pageNo + 1);
   };
 
-  const getCoverImageUrl = (item: iItem) => {
-    const imgUrl = `${item.CoverAsset?.url || ''}`.trim();
-    if (imgUrl === '') {
-      return '/default.png';
-    }
-    return imgUrl;
-  };
-
   const navTo = (itemId: string) => {
     router.replace(`/item/${itemId}`);
   };
@@ -108,7 +101,9 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
             <div className={'item'} key={item.id}>
               <div
                 className={'cover-img'}
-                style={{ backgroundImage: `url(${getCoverImageUrl(item)})` }}
+                style={{
+                  backgroundImage: `url(${ItemService.getCoverImageUrl(item)})`
+                }}
                 onClick={() => navTo(item.id)}
               />
               <div className={'info'}>
@@ -119,7 +114,9 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
                   {item.title}
                 </div>
                 <div className={'date '}>{getPublishAt(item)}</div>
-                <div className={'excerpt ellipsis'}>{item.excerpt}</div>
+                <div className={'excerpt ellipsis'}>
+                  {Utils.stripHTMLTags(item.excerpt || '')}
+                </div>
               </div>
             </div>
           );

@@ -1,5 +1,3 @@
-import WeChatJS from '@/components/WeChatJS';
-
 type iPage = {
   header?: any;
   children: any;
@@ -10,7 +8,6 @@ const Page = ({ header, children, className }: iPage) => {
     <div className={`page-wrapper ${className}`}>
       {header || null}
       <main>{children}</main>
-      <WeChatJS />
     </div>
   );
 };

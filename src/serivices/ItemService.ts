@@ -25,9 +25,18 @@ const getAllItemsUnderCompany = async (
   }).then(resp => resp.data);
 };
 
+const getCoverImageUrl = (item: iItem) => {
+  const imgUrl = `${item.CoverAsset?.url || ''}`.trim();
+  if (imgUrl === '') {
+    return '/default.png';
+  }
+  return imgUrl;
+};
+
 const ItemService = {
   getItemById,
-  getAllItemsUnderCompany
+  getAllItemsUnderCompany,
+  getCoverImageUrl
 };
 
 export default ItemService;

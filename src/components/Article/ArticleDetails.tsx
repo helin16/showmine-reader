@@ -1,11 +1,50 @@
 import iItem from '@/types/iItem';
 import moment from 'moment';
+import { useEffect, useState } from 'react';
+import WeChatService from '@/serivices/WeChatService';
+import ItemService from '@/serivices/ItemService';
+import Utils from '@/serivices/Utils';
 
 type iArticleDetails = {
   item: iItem;
 };
 
 const ArticleDetails = ({ item }: iArticleDetails) => {
+  const [isInWeChat, setIsInWeChat] = useState(false);
+
+  useEffect(() => {
+    setIsInWeChat(WeChatService.isInWeChat());
+  }, []);
+
+  useEffect(() => {
+    if (isInWeChat !== true) {
+      return;
+    }
+    WeChatService.runWhenWXReady()
+      .then(xw => {
+        xw.shareOnChat({
+          type: 'link',
+          title: item.title,
+          link: WeChatService.getShareItemUrl(item.id),
+          imgUrl: ItemService.getCoverImageUrl(item),
+          desc: Utils.stripHTMLTags(item.excerpt || '')
+          // success: () => {},
+          // cancel: () => {}
+        });
+        xw.shareOnMoment({
+          type: 'link',
+          title: item.title,
+          link: WeChatService.getShareItemUrl(item.id),
+          imgUrl: ItemService.getCoverImageUrl(item)
+          // success: () => {},
+          // cancel: () => {}
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, [isInWeChat]);
+
   const getAuthorUrl = () => {
     const url = `${item.Author?.url || ''}`.trim();
     if (url === '') {
