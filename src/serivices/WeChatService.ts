@@ -18,39 +18,39 @@ const getWX = async () => {
   if (window && !wechatObj) {
     const result = await getWeChatJsConfig(window.location.href || '');
     wechatObj = new WechatJSSDK({
-      ...result
+      ...result,
       // debug: true
-      // jsApiList: [
-      //   'checkJsApi',
-      //   'updateAppMessageShareData',
-      //   'updateTimelineShareData',
-      //   'hideMenuItems',
-      //   'showMenuItems',
-      //   'hideAllNonBaseMenuItem',
-      //   'showAllNonBaseMenuItem',
-      //   'translateVoice',
-      //   'startRecord',
-      //   'stopRecord',
-      //   'onVoiceRecordEnd',
-      //   'playVoice',
-      //   'onVoicePlayEnd',
-      //   'pauseVoice',
-      //   'stopVoice',
-      //   'uploadVoice',
-      //   'downloadVoice',
-      //   'chooseImage',
-      //   'previewImage',
-      //   'uploadImage',
-      //   'downloadImage',
-      //   'getNetworkType',
-      //   'openLocation',
-      //   'getLocation',
-      //   'hideOptionMenu',
-      //   'showOptionMenu',
-      //   'closeWindow',
-      //   'scanQRCode',
-      //   'chooseWXPay'
-      // ]
+      jsApiList: [
+        'checkJsApi',
+        'updateAppMessageShareData',
+        'updateTimelineShareData',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onVoiceRecordEnd',
+        'playVoice',
+        'onVoicePlayEnd',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay'
+      ]
     });
   }
   return wechatObj;
