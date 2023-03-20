@@ -14,9 +14,12 @@ const getWeChatJsConfig = (
     resp => resp.data
   );
 
-const getWX = async () => {
+const getWX = async (wxJsSdkObj: any = null) => {
   if (window && !wechatObj) {
-    const result = await getWeChatJsConfig(window.location.href || '');
+    const result =
+      wxJsSdkObj === null
+        ? await getWeChatJsConfig(window.location.href || '')
+        : wxJsSdkObj;
     wechatObj = new WechatJSSDK({
       ...result,
       // debug: true,
@@ -59,8 +62,8 @@ const getWX = async () => {
 const isInWeChat = () =>
   /(micromessenger|webbrowser)/.test(navigator.userAgent.toLocaleLowerCase());
 
-const runWhenWXReady = async () => {
-  const wx = await getWX();
+const runWhenWXReady = async (wxJsSdKObj: any) => {
+  const wx = await getWX(wxJsSdKObj);
   if (!wx) {
     console.error('XW is empty');
     return {};

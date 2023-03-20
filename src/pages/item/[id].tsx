@@ -3,10 +3,10 @@ import Header from '../../components/Header';
 import ItemService from '@/serivices/ItemService';
 import Page404 from '@/components/Page404';
 import ArticleDetails from '@/components/Article/ArticleDetails';
-import ItemListUnderCompany from '@/components/Item/ItemListUnderCompany';
 import ArticleFooter from '@/components/Article/ArticleFooter';
+import WeChatService from '@/serivices/WeChatService';
 
-const ItemDetailsPage = ({ item }: any) => {
+const ItemDetailsPage = ({ item, wxJsSdKObj }: any) => {
   const getContent = () => {
     if (item === undefined) {
       return <Page404 />;
@@ -23,7 +23,7 @@ const ItemDetailsPage = ({ item }: any) => {
     }
     return (
       <>
-        <ArticleDetails item={item} />
+        <ArticleDetails item={item} wxJsSdKObj={wxJsSdKObj} />
         <ArticleFooter company={item.Company} />
       </>
     );
@@ -41,17 +41,26 @@ const ItemDetailsPage = ({ item }: any) => {
 export const getServerSideProps = async ({ params }: any) => {
   const { id } = params;
   let item = undefined;
+  let wxJsSdKObj = {};
   try {
-    item = await ItemService.getItemById(id, {
-      include: 'Author,Company.LogoAsset',
-      isVisit: '1'
-    });
+    const [itemRes, wxJsSdKRes] = await Promise.all([
+      ItemService.getItemById(id, {
+        include: 'Author,Company.LogoAsset',
+        isVisit: '1'
+      }),
+      WeChatService.getWeChatJsConfig(
+        process.env.NEXT_PUBLIC_READER_BASE_URL || ''
+      )
+    ]);
+    item = itemRes;
+    wxJsSdKObj = wxJsSdKRes;
   } catch (err) {
     console.error(err);
   }
   return {
     props: {
-      item: item
+      item,
+      wxJsSdKObj
     }
   };
 };
