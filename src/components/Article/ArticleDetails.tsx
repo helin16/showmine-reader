@@ -24,7 +24,7 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     }
     setIsLoading(true);
     WeChatService.runWhenWXReady()
-      .then(xw => {
+      .then(({ xw }) => {
         console.log('artcile details xw', xw);
         xw.updateAppMessageShareData({
           type: 'link',
