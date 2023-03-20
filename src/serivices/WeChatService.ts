@@ -19,7 +19,7 @@ const getWX = async () => {
     const result = await getWeChatJsConfig(window.location.href || '');
     wechatObj = new WechatJSSDK({
       ...result,
-      debug: true,
+      // debug: true,
       jsApiList: [
         'checkJsApi',
         'updateAppMessageShareData',
@@ -62,9 +62,10 @@ const isInWeChat = () =>
 const runWhenWXReady = async () => {
   const wx = await getWX();
   if (!wx) {
-    console.log('XW is empty');
+    console.error('XW is empty');
+    return {};
   }
-  console.log('wx', wx);
+  // console.log('wx', wx);
   return wx.initialize();
 };
 

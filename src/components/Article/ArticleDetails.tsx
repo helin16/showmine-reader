@@ -25,26 +25,26 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     setIsLoading(true);
     WeChatService.runWhenWXReady()
       .then(({ wx }) => {
-        console.log('artcile details xw', wx);
+        // console.log('artcile details xw', wx);
         wx.updateAppMessageShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
           imgUrl: ItemService.getCoverImageUrl(item),
-          desc: Utils.stripHTMLTags(item.excerpt || ''),
-          success: () => {
-            alert('Shared Successfully.分享成功');
-          }
+          desc: Utils.stripHTMLTags(item.excerpt || '')
+          // success: () => {
+          //   alert('Shared Successfully.分享成功');
+          // }
           // cancel: () => {}
         });
         wx.updateTimelineShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
-          imgUrl: ItemService.getCoverImageUrl(item),
-          success: () => {
-            alert('Shared Successfully.分享成功');
-          }
+          imgUrl: ItemService.getCoverImageUrl(item)
+          // success: () => {
+          //   alert('Shared Successfully.分享成功');
+          // }
           // success: () => {},
           // cancel: () => {}
         });
