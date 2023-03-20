@@ -14,15 +14,12 @@ const getWeChatJsConfig = (
     resp => resp.data
   );
 
-const getWX = async (wxJsSdkObj: any = null) => {
+const getWX = async () => {
   if (window && !wechatObj) {
-    const result =
-      wxJsSdkObj === null
-        ? await getWeChatJsConfig(window.location.href || '')
-        : wxJsSdkObj;
+    const result = await getWeChatJsConfig(window.location.href || '');
     wechatObj = new WechatJSSDK({
       ...result,
-      // debug: true,
+      debug: true,
       jsApiList: [
         'checkJsApi',
         'updateAppMessageShareData',
@@ -62,19 +59,18 @@ const getWX = async (wxJsSdkObj: any = null) => {
 const isInWeChat = () =>
   /(micromessenger|webbrowser)/.test(navigator.userAgent.toLocaleLowerCase());
 
-const runWhenWXReady = async (wxJsSdKObj: any) => {
-  const wx = await getWX(wxJsSdKObj);
+const runWhenWXReady = async () => {
+  const wx = await getWX();
   if (!wx) {
-    console.error('XW is empty');
-    return {};
+    console.log('XW is empty');
   }
-  // console.log('wx', wx);
+  console.log('wx', wx);
   return wx.initialize();
 };
 
 const getShareItemUrl = (itemId: string) => {
   return `${
-    process.env.NEXT_PUBLIC_API_END_POINT || ''
+    process.env.NEXT_PUBLIC_READER_BASE_URL || ''
   }/item/redirect?itemId=${itemId}`;
 };
 

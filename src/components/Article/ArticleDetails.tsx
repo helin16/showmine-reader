@@ -8,10 +8,9 @@ import Spinner from '@/components/Spinner';
 
 type iArticleDetails = {
   item: iItem;
-  wxJsSdKObj?: any;
 };
 
-const ArticleDetails = ({ item, wxJsSdKObj }: iArticleDetails) => {
+const ArticleDetails = ({ item }: iArticleDetails) => {
   const [isInWeChat, setIsInWeChat] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,29 +23,28 @@ const ArticleDetails = ({ item, wxJsSdKObj }: iArticleDetails) => {
       return;
     }
     setIsLoading(true);
-    WeChatService.runWhenWXReady(wxJsSdKObj)
+    WeChatService.runWhenWXReady()
       .then(({ wx }) => {
-        // console.log('artcile details xw', wx);
+        console.log('artcile details xw', wx);
         wx.updateAppMessageShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
           imgUrl: ItemService.getCoverImageUrl(item),
-          desc: Utils.stripHTMLTags(item.excerpt || '')
-          // success: () => {
-          //   alert('Shared Successfully.分享成功');
-          // }
+          desc: Utils.stripHTMLTags(item.excerpt || ''),
+          success: () => {
+            console.log('updateAppMessageShareData loaded');
+          }
           // cancel: () => {}
         });
         wx.updateTimelineShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
-          imgUrl: ItemService.getCoverImageUrl(item)
-          // success: () => {
-          //   alert('Shared Successfully.分享成功');
-          // }
-          // success: () => {},
+          imgUrl: ItemService.getCoverImageUrl(item),
+          success: () => {
+            console.log('updateTimelineShareData loaded');
+          }
           // cancel: () => {}
         });
       })
@@ -98,6 +96,10 @@ const ArticleDetails = ({ item, wxJsSdKObj }: iArticleDetails) => {
       />
     );
   };
+
+  if (isLoading === true) {
+    return <Spinner />;
+  }
 
   return (
     <div className={'article-details-wrapper'}>

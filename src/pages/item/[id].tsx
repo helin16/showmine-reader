@@ -3,10 +3,10 @@ import Header from '../../components/Header';
 import ItemService from '@/serivices/ItemService';
 import Page404 from '@/components/Page404';
 import ArticleDetails from '@/components/Article/ArticleDetails';
+import ItemListUnderCompany from '@/components/Item/ItemListUnderCompany';
 import ArticleFooter from '@/components/Article/ArticleFooter';
-import WeChatService from '@/serivices/WeChatService';
 
-const ItemDetailsPage = ({ item, wxJsSdKObj }: any) => {
+const ItemDetailsPage = ({ item }: any) => {
   const getContent = () => {
     if (item === undefined) {
       return <Page404 />;
@@ -23,7 +23,7 @@ const ItemDetailsPage = ({ item, wxJsSdKObj }: any) => {
     }
     return (
       <>
-        <ArticleDetails item={item} wxJsSdKObj={wxJsSdKObj} />
+        <ArticleDetails item={item} />
         <ArticleFooter company={item.Company} />
       </>
     );
@@ -41,26 +41,17 @@ const ItemDetailsPage = ({ item, wxJsSdKObj }: any) => {
 export const getServerSideProps = async ({ params }: any) => {
   const { id } = params;
   let item = undefined;
-  let wxJsSdKObj = {};
   try {
-    const [itemRes, wxJsSdKRes] = await Promise.all([
-      ItemService.getItemById(id, {
-        include: 'Author,Company.LogoAsset',
-        isVisit: '1'
-      }),
-      WeChatService.getWeChatJsConfig(
-        process.env.NEXT_PUBLIC_READER_BASE_URL || ''
-      )
-    ]);
-    item = itemRes;
-    wxJsSdKObj = wxJsSdKRes;
+    item = await ItemService.getItemById(id, {
+      include: 'Author,Company.LogoAsset',
+      isVisit: '1'
+    });
   } catch (err) {
     console.error(err);
   }
   return {
     props: {
-      item,
-      wxJsSdKObj
+      item: item
     }
   };
 };
