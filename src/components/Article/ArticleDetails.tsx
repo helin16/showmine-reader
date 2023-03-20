@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import WeChatService from '@/serivices/WeChatService';
 import ItemService from '@/serivices/ItemService';
 import Utils from '@/serivices/Utils';
+import Spinner from '@/components/Spinner';
 
 type iArticleDetails = {
   item: iItem;
@@ -11,6 +12,7 @@ type iArticleDetails = {
 
 const ArticleDetails = ({ item }: iArticleDetails) => {
   const [isInWeChat, setIsInWeChat] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsInWeChat(WeChatService.isInWeChat());
@@ -20,8 +22,10 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     if (isInWeChat !== true) {
       return;
     }
+    setIsLoading(true);
     WeChatService.runWhenWXReady()
       .then(xw => {
+        console.log('artcile details xw', xw);
         xw.updateAppMessageShareData({
           type: 'link',
           title: item.title,
@@ -47,6 +51,9 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
       })
       .catch(err => {
         console.error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [isInWeChat]);
 
@@ -90,6 +97,10 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
       />
     );
   };
+
+  if (isLoading === true) {
+    return <Spinner />;
+  }
 
   return (
     <div className={'article-details-wrapper'}>
