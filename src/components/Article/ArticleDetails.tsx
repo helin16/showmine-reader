@@ -24,9 +24,9 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     }
     setIsLoading(true);
     WeChatService.runWhenWXReady()
-      .then(({ xw }) => {
-        console.log('artcile details xw', xw);
-        xw.updateAppMessageShareData({
+      .then(({ wx }) => {
+        console.log('artcile details xw', wx);
+        wx.updateAppMessageShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
@@ -37,7 +37,7 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
           }
           // cancel: () => {}
         });
-        xw.updateTimelineShareData({
+        wx.updateTimelineShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
