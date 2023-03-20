@@ -70,7 +70,7 @@ const runWhenWXReady = async () => {
 
 const getShareItemUrl = (itemId: string) => {
   return `${
-    process.env.NEXT_PUBLIC_READER_BASE_URL || ''
+    process.env.NEXT_PUBLIC_API_END_POINT || ''
   }/item/redirect?itemId=${itemId}`;
 };
 
