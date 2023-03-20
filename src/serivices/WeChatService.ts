@@ -61,11 +61,17 @@ const isInWeChat = () =>
 
 const runWhenWXReady = async () => {
   const wx = await getWX();
+  if (!wx) {
+    console.log('XW is empty');
+  }
+  console.log('wx', wx);
   return wx.initialize();
 };
 
 const getShareItemUrl = (itemId: string) => {
-  return `${process.env.NEXT_PUBLIC_READER_BASE_URL || ''}/item/${itemId}`;
+  return `${
+    process.env.NEXT_PUBLIC_READER_BASE_URL || ''
+  }/item/redirect?itemId=${itemId}`;
 };
 
 const WeChatService = {
