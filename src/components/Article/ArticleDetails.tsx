@@ -97,9 +97,9 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
     );
   };
 
-  if (isLoading === true) {
-    return <Spinner />;
-  }
+  // if (isLoading === true) {
+  //   return <Spinner />;
+  // }
 
   return (
     <div className={'article-details-wrapper'}>
