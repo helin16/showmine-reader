@@ -99,10 +99,6 @@ const ArticleDetails = ({ item, wxJsSdKObj }: iArticleDetails) => {
     );
   };
 
-  if (isLoading === true) {
-    return <Spinner />;
-  }
-
   return (
     <div className={'article-details-wrapper'}>
       <div className={'header margin-bottom-md'}>
