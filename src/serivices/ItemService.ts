@@ -28,7 +28,7 @@ const getAllItemsUnderCompany = async (
 const getCoverImageUrl = (item: iItem) => {
   const imgUrl = `${item.CoverAsset?.url || ''}`.trim();
   if (imgUrl === '') {
-    return '/default.png';
+    return `${process.env.NEXT_PUBLIC_READER_BASE_URL || ''}/default.png`;
   }
   return imgUrl;
 };

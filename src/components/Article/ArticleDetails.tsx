@@ -27,15 +27,20 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
           imgUrl: ItemService.getCoverImageUrl(item),
-          desc: Utils.stripHTMLTags(item.excerpt || '')
-          // success: () => {},
+          desc: Utils.stripHTMLTags(item.excerpt || ''),
+          success: () => {
+            alert('Shared Successfully.分享成功');
+          }
           // cancel: () => {}
         });
         xw.updateTimelineShareData({
           type: 'link',
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
-          imgUrl: ItemService.getCoverImageUrl(item)
+          imgUrl: ItemService.getCoverImageUrl(item),
+          success: () => {
+            alert('Shared Successfully.分享成功');
+          }
           // success: () => {},
           // cancel: () => {}
         });

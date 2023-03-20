@@ -19,7 +19,7 @@ const getWX = async () => {
     const result = await getWeChatJsConfig(window.location.href || '');
     wechatObj = new WechatJSSDK({
       ...result,
-      // debug: true
+      debug: true,
       jsApiList: [
         'checkJsApi',
         'updateAppMessageShareData',
