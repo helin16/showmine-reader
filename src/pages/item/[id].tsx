@@ -43,7 +43,7 @@ export const getServerSideProps = async ({ params }: any) => {
   let item = undefined;
   try {
     item = await ItemService.getItemById(id, {
-      include: 'Author,Company.LogoAsset',
+      include: 'CoverAsset,Author,Company.LogoAsset',
       isVisit: '1'
     });
   } catch (err) {
