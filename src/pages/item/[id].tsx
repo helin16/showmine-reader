@@ -46,7 +46,7 @@ export const getServerSideProps = async ({ params }: any) => {
     const [itemDetails, configObj] = await Promise.all([
       ItemService.getItemById(id, {
         include: 'CoverAsset,Author,Company.LogoAsset',
-        isVisit: '1'
+        isVisit: true
       }),
       weChatService.getWeChatJsConfig(weChatService.getItemCurrentUrl(id))
     ]);
