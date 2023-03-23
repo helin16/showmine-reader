@@ -1,6 +1,7 @@
 import AppService, { iConfigParams } from '@/serivices/AppService';
 // @ts-ignore
 import WechatJSSDK from 'wechat-jssdk/dist/client.umd';
+import LocalStorageService from '@/serivices/LocalStorageService';
 
 const endPoint = '/weChat';
 let wechatObj: any = null;
@@ -16,8 +17,21 @@ const getWeChatJsConfig = (
 
 const getWX = async () => {
   if (window && !wechatObj) {
-    const result = await getWeChatJsConfig(window.location.href || '');
-    wechatObj = new WechatJSSDK({
+    const localJsSDk = `${LocalStorageService.getJsSdk()}`.trim();
+    let result: any;
+    if (localJsSDk === '') {
+      result = await getWeChatJsConfig(
+        process.env.NEXT_PUBLIC_READER_BASE_URL || window.location.href || ''
+      );
+      LocalStorageService.setJsSdk(JSON.stringify(result));
+    } else {
+      try {
+        result = JSON.parse(localJsSDk);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    const configObj = {
       ...result,
       // debug: true,
       jsApiList: [
@@ -51,7 +65,8 @@ const getWX = async () => {
         'scanQRCode',
         'chooseWXPay'
       ]
-    });
+    };
+    wechatObj = new WechatJSSDK(configObj);
   }
   return wechatObj;
 };

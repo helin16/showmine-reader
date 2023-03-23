@@ -2,6 +2,10 @@ const getTokenName = () => {
   return process.env.NEXT_PUBLIC_LOCAL_USER_TOKEN_NAME || 'token';
 };
 
+const getJsConfigCache = () => {
+  return process.env.NEXT_PUBLIC_LOCAL_JsConfig || 'jssdk';
+};
+
 const getToken = () => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem(getTokenName());
@@ -20,10 +24,32 @@ const removeToken = () => {
   }
 };
 
+const getJsSdk = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(getJsConfigCache());
+  }
+};
+
+const setJsSdk = (newObjJson: string) => {
+  if (typeof window !== 'undefined') {
+    return localStorage.setItem(getJsConfigCache(), newObjJson);
+  }
+};
+
+const removeJsSdk = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.removeItem(getJsConfigCache());
+  }
+};
+
 const LocalStorageService = {
   getToken,
   setToken,
   removeToken,
+
+  getJsSdk,
+  setJsSdk,
+  removeJsSdk
 };
 
 export default LocalStorageService;
