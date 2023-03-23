@@ -31,7 +31,11 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
           imgUrl: ItemService.getCoverImageUrl(item),
-          desc: Utils.stripHTMLTags(item.excerpt || ''),
+          desc: Utils.stripHTMLTags(
+            `${item.excerpt || ''}`.trim() === ''
+              ? `${item.content || ''}`.trim()
+              : `${item.excerpt || ''}`.trim()
+          ),
           success: () => {
             console.log('updateAppMessageShareData loaded');
           }
