@@ -15,22 +15,13 @@ const getWeChatJsConfig = (
     resp => resp.data
   );
 
-const getWX = async () => {
+const getWX = async (jsConfig?: any) => {
   if (window && !wechatObj) {
-    const localJsSDk = `${LocalStorageService.getJsSdk() || ''}`.trim();
-    console.log('localJsSDk', localJsSDk);
-    let result: any;
-    if (localJsSDk === '') {
-      result = await getWeChatJsConfig(
-        process.env.NEXT_PUBLIC_READER_BASE_URL || window.location.href || ''
-      );
-      LocalStorageService.setJsSdk(JSON.stringify(result));
-    } else {
-      try {
-        result = JSON.parse(localJsSDk);
-      } catch (err) {
-        console.error(err);
-      }
+    // const localJsSDk = `${LocalStorageService.getJsSdk() || ''}`.trim();
+    console.log('jsConfig', jsConfig);
+    let result: any = jsConfig;
+    if (!result) {
+      result = await getWeChatJsConfig(window.location.href || '');
     }
     const configObj = {
       ...result,
@@ -67,6 +58,7 @@ const getWX = async () => {
         'chooseWXPay'
       ]
     };
+    console.log('configObj', configObj);
     wechatObj = new WechatJSSDK(configObj);
   }
   return wechatObj;
@@ -75,8 +67,8 @@ const getWX = async () => {
 const isInWeChat = () =>
   /(micromessenger|webbrowser)/.test(navigator.userAgent.toLocaleLowerCase());
 
-const runWhenWXReady = async () => {
-  const wx = await getWX();
+const runWhenWXReady = async (jsConfig?: any) => {
+  const wx = await getWX(jsConfig);
   if (!wx) {
     console.log('XW is empty');
   }
@@ -90,11 +82,16 @@ const getShareItemUrl = (itemId: string) => {
   }/item/redirect?itemId=${itemId}`;
 };
 
+const getItemCurrentUrl = (itemId: string) => {
+  return `${process.env.NEXT_PUBLIC_READER_BASE_URL || ''}/item/${itemId}`;
+};
+
 const WeChatService = {
   getWeChatJsConfig,
   isInWeChat,
   runWhenWXReady,
-  getShareItemUrl
+  getShareItemUrl,
+  getItemCurrentUrl
 };
 
 export default WeChatService;

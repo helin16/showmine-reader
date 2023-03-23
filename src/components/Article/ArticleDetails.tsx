@@ -8,9 +8,10 @@ import Spinner from '@/components/Spinner';
 
 type iArticleDetails = {
   item: iItem;
+  jsConfig?: any;
 };
 
-const ArticleDetails = ({ item }: iArticleDetails) => {
+const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
   const [isInWeChat, setIsInWeChat] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +24,7 @@ const ArticleDetails = ({ item }: iArticleDetails) => {
       return;
     }
     setIsLoading(true);
-    WeChatService.runWhenWXReady()
+    WeChatService.runWhenWXReady(jsConfig)
       .then(({ wx }) => {
         console.log('artcile details xw', wx);
         wx.updateAppMessageShareData({
