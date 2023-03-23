@@ -51,7 +51,7 @@ export const getServerSideProps = async ({ params }: any) => {
   }
   return {
     props: {
-      item: item
+      item: item || {}
     }
   };
 };

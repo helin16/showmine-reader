@@ -30,7 +30,7 @@ const getCoverImageUrl = (item: iItem) => {
   if (imgUrl === '') {
     return `${process.env.NEXT_PUBLIC_READER_BASE_URL || ''}/default.png`;
   }
-  return imgUrl;
+  return imgUrl.replace('/image/upload/', '/image/upload/w_300/');
 };
 
 const ItemService = {

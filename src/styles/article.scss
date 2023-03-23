@@ -6,9 +6,11 @@ $logoWidth: 15vw;
 
   .content-wrapper {
     line-height: 1.9rem;
+    video,
+    table,
     img {
-      width: 100%;
-      height: auto;
+      width: 100% !important;
+      height: auto !important;
     }
   }
 
