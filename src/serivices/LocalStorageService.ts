@@ -3,7 +3,7 @@ const getTokenName = () => {
 };
 
 const getJsConfigCache = () => {
-  return process.env.NEXT_PUBLIC_LOCAL_JsConfig || 'jssdk';
+  return process.env.NEXT_PUBLIC_LOCAL_JS_CONFIG || 'jssdk';
 };
 
 const getToken = () => {

@@ -17,7 +17,7 @@ const getWeChatJsConfig = (
 
 const getWX = async () => {
   if (window && !wechatObj) {
-    const localJsSDk = `${LocalStorageService.getJsSdk()}`.trim();
+    const localJsSDk = `${LocalStorageService.getJsSdk() || ''}`.trim();
     console.log('localJsSDk', localJsSDk);
     let result: any;
     if (localJsSDk === '') {
