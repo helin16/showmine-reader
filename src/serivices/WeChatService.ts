@@ -79,7 +79,7 @@ const runWhenWXReady = async (jsConfig?: any) => {
 const getShareItemUrl = (itemId: string) => {
   return `${
     process.env.NEXT_PUBLIC_API_END_POINT || ''
-  }/item/redirect?itemId=${itemId}`;
+  }/item/redirect?itemId=${itemId}&from=wechat`;
 };
 
 const getItemCurrentUrl = (itemId: string) => {
