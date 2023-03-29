@@ -5,6 +5,7 @@ import WeChatService from '@/serivices/WeChatService';
 import ItemService from '@/serivices/ItemService';
 import Utils from '@/serivices/Utils';
 import Spinner from '@/components/Spinner';
+import jQuery from 'jquery';
 
 type iArticleDetails = {
   item: iItem;
@@ -14,10 +15,24 @@ type iArticleDetails = {
 const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
   const [isInWeChat, setIsInWeChat] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     setIsInWeChat(WeChatService.isInWeChat());
   }, []);
+
+  useEffect(() => {
+    const contentStr = `${item?.content || ''}`.trim();
+    if (contentStr === '') {
+      return;
+    }
+    // @ts-ignore
+    setImageUrls(
+      (contentStr.match(/<img [^>]*src="[^"]*"[^>]*>/gm) || []).map(x =>
+        x.replace(/.*src="([^"]*)".*/, '$1')
+      )
+    );
+  }, [item?.content]);
 
   useEffect(() => {
     if (isInWeChat !== true) {
@@ -26,7 +41,12 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
     setIsLoading(true);
     WeChatService.runWhenWXReady(jsConfig)
       .then(({ wx }) => {
-        console.log('artcile details xw', wx);
+        jQuery(`#article-content-${item.id} img`).on('click', e => {
+          wx.previewImage({
+            current: jQuery(e.target).attr('src'), // 当前显示图片的http链接
+            urls: imageUrls // 需要预览的图片http链接列表
+          });
+        });
         wx.updateAppMessageShareData({
           type: 'link',
           title: item.title,
@@ -123,6 +143,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
       <div className={'content-wrapper'}>
         {/*// @ts-ignore*/}
         <div
+          id={`article-content-${item.id}`}
           className={'content margin-bottom-md'}
           dangerouslySetInnerHTML={{ __html: item.content || '' }}
         />
