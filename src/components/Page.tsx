@@ -1,3 +1,5 @@
+import GTranslator from '@/components/GTranslator';
+
 type iPage = {
   header?: any;
   children: any;
@@ -7,6 +9,7 @@ const Page = ({ header, children, className }: iPage) => {
   return (
     <div className={`page-wrapper ${className}`}>
       {header || null}
+      <GTranslator />
       <main>{children}</main>
     </div>
   );

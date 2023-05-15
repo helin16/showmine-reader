@@ -1,0 +1,16 @@
+
+.skiptranslate {
+  display: none;
+}
+
+.g-translator {
+  position: relative;
+}
+.g-translator .icons {
+  position: absolute;
+  top: -1rem;
+  right: 0px;
+}
+.g-translator .icons img {
+  cursor: pointer;
+}
