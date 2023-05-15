@@ -1,64 +1,65 @@
-import { useEffect, useState } from 'react';
-import { hasCookie, setCookie, getCookie } from 'cookies-next';
+import { useEffect } from 'react';
 
-const LANGUAGE_ENGLISH = '/auto/en';
-const LANGUAGE_CHINESE = '/auto/zh-CN';
+const LANGUAGE_ENGLISH = 'en';
+const LANGUAGE_CHINESE = 'zh-CN';
 
+const HTML_ID_FOR_JS = 'app-gTranslator-js';
 const HTML_ID_FOR_SELECTOR = 'app-gTranslator';
 const GTranslator = () => {
-  const [, setSelected] = useState(LANGUAGE_CHINESE);
   useEffect(() => {
-    const addScript = document.createElement('script');
-    addScript.setAttribute(
-      'src',
-      '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
-    );
-    document.body.appendChild(addScript);
-    // @ts-ignore
-    window.googleTranslateElementInit = googleTranslateElementInit;
+    if (!document.getElementById(HTML_ID_FOR_JS)) {
+      const addScript = document.createElement('script');
+      addScript.setAttribute('id', HTML_ID_FOR_JS);
+      addScript.setAttribute(
+        'src',
+        '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+      );
 
-    if (hasCookie('googtrans')) {
+      document.body.appendChild(addScript);
       // @ts-ignore
-      setSelected(getCookie('googtrans'));
-    } else {
-      // @ts-ignore
-      setSelected(LANGUAGE_CHINESE);
+      window.googleTranslateElementInit = () => {
+        // @ts-ignore
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: 'auto',
+            autoDisplay: false,
+            includedLanguages: [LANGUAGE_ENGLISH, LANGUAGE_CHINESE].join(',')
+            // @ts-ignore
+            // layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          },
+          HTML_ID_FOR_SELECTOR
+        );
+      };
     }
   }, []);
 
-  const googleTranslateElementInit = () => {
-    // @ts-ignore
-    new window.google.translate.TranslateElement(
-      {
-        pageLanguage: 'auto',
-        autoDisplay: false,
-        includedLanguages: 'en,zh-CN'
-      },
-      HTML_ID_FOR_SELECTOR
-    );
-  };
-
   const langChange = (langCode: string) => {
-    if (hasCookie('googtrans')) {
-      setCookie('googtrans', decodeURI(langCode));
-      setSelected(langCode);
-    } else {
-      setCookie('googtrans', langCode);
-      setSelected(langCode);
+    const div = document.getElementById(HTML_ID_FOR_SELECTOR);
+    if (div) {
+      const options = div.getElementsByTagName('option');
+      const select = div.getElementsByTagName('select')[0];
+      for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        if (option.value === langCode) {
+          if (select) {
+            select.value = langCode;
+            select.dispatchEvent(new Event('change'));
+          }
+        }
+      }
     }
-    window.location.reload();
   };
 
   return (
     <div className={'g-translator'}>
-      <div id={HTML_ID_FOR_SELECTOR} style={{ display: 'none' }} />
+      <div id={HTML_ID_FOR_SELECTOR} style={{ visibility: 'hidden' }} />
       <div className={'icons'}>
         <img
           src={'https://cdn.gtranslate.net/flags/24/zh-CN.png'}
           alt={'Simplified Chinese'}
           title={'中文(Simplified Chinese)'}
           onClick={() => langChange(LANGUAGE_CHINESE)}
-        />
+        />{' '}
         <img
           src={'https://cdn.gtranslate.net/flags/24/en.png'}
           alt={'English'}

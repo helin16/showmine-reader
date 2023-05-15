@@ -1,5 +1,6 @@
 
 .skiptranslate {
+  display: none;
 }
 
 .g-translator {
@@ -7,8 +8,8 @@
 }
 .g-translator .icons {
   position: absolute;
-  top: -1rem;
   right: 0px;
+  top: -1rem;
 }
 .g-translator .icons img {
   cursor: pointer;
