@@ -29,8 +29,8 @@ const GTranslator = () => {
     new window.google.translate.TranslateElement(
       {
         pageLanguage: 'auto',
-        autoDisplay: false
-        // includedLanguages: "en,zh-CN", // If you remove it, by default all google supported language will be included
+        autoDisplay: false,
+        includedLanguages: 'en,zh-CN' // If you remove it, by default all google supported language will be included
       },
       'app-gTranslator'
     );
