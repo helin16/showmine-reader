@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { hasCookie, setCookie } from 'cookies-next';
+import { hasCookie, setCookie, getCookie } from 'cookies-next';
 
 const LANGUAGE_ENGLISH = '/auto/en';
 const LANGUAGE_CHINESE = '/auto/zh-CN';
