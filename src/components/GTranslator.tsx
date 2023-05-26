@@ -61,7 +61,7 @@ const GTranslator = () => {
           onClick={() => langChange(LANGUAGE_CHINESE)}
         />{' '}
         <img
-          src={'/images/aus-flag.png'}
+          src={'/images/aus.png'}
           alt={'English'}
           title={'English(英文)'}
           onClick={() => langChange(LANGUAGE_ENGLISH)}
