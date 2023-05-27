@@ -5,6 +5,7 @@ import Page404 from '@/components/Page404';
 import ArticleDetails from '@/components/Article/ArticleDetails';
 import ArticleFooter from '@/components/Article/ArticleFooter';
 import weChatService from '@/serivices/WeChatService';
+import GTranslator from '@/components/GTranslator';
 
 const ItemDetailsPage = ({ item, config }: any) => {
   const getContent = () => {
@@ -33,6 +34,7 @@ const ItemDetailsPage = ({ item, config }: any) => {
     <Page
       header={<Header title={item?.title} description={item?.description} />}
     >
+      {item.enableGTranslateFlag === true ? <GTranslator /> : null}
       <div>{getContent()}</div>
     </Page>
   );

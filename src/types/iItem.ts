@@ -17,6 +17,7 @@ type iItem = iBaseType & {
   publishedById?: string | null;
   Company?: iCompany;
   CoverAsset?: iAsset;
+  enableGTranslateFlag: boolean;
 };
 
 export default iItem;
