@@ -80,13 +80,14 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
     if (isLoading && pageNo > 1) {
       return <Spinner />;
     }
-    return (
-      <div className={'text-center'}>
-        <a className={'weui-btn weui-btn_primary'} onClick={() => nextPage()}>
-          Load more 更多
-        </a>
-      </div>
-    );
+    return null;
+    // return (
+    //   <div className={'text-center load-more-btn-wrapper'}>
+    //     <a className={'weui-btn weui-btn_primary'} onClick={() => nextPage()}>
+    //       Load more 更多
+    //     </a>
+    //   </div>
+    // );
   };
 
   const getList = () => {
