@@ -20,7 +20,7 @@ export const getServerSideProps = async ({ query }: any) => {
 
   return {
     redirect: {
-      destination: `/item/${itemIdString}`,
+      destination: `/item/${encodeURIComponent(itemIdString)}`,
       permanent: false
     }
   };
