@@ -51,6 +51,22 @@ describe('item page', () => {
         consoleError.mockRestore();
       }
     );
+
+    // Current behaviour, reported as a bug: Promise.all ties the article to the
+    // WeChat signature, so a WeChat outage hides a valid article.
+    test('loses the item when only the WeChat config fails', async () => {
+      vi.mocked(ItemService.getItemById).mockResolvedValue({ id: 'a' } as any);
+      vi.mocked(weChatService.getWeChatJsConfig).mockRejectedValue(
+        new Error('signature')
+      );
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+      const result: any = await getServerSideProps({ params: { id: 'a' } });
+      expect(result.props.item).toStrictEqual({});
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      consoleError.mockRestore();
+    });
   });
 
   describe('rendering', () => {
@@ -69,6 +85,20 @@ describe('item page', () => {
       render(<ItemDetailsPage item={item} />);
       expect(screen.getByText(/文章无法访问/)).toBeInTheDocument();
       expect(screen.queryByText(/article:/)).not.toBeInTheDocument();
+    });
+
+    // Current behaviour, reported as a bug: item.enableGTranslateFlag is read
+    // without a guard, so the undefined check in getContent() cannot be reached.
+    // getServerSideProps always passes an object, so this needs a direct render.
+    test('throws instead of showing 404 when the item is undefined', () => {
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+      const silence = (event: ErrorEvent) => event.preventDefault();
+      window.addEventListener('error', silence);
+      expect(() => render(<ItemDetailsPage />)).toThrow(TypeError);
+      window.removeEventListener('error', silence);
+      consoleError.mockRestore();
     });
 
     test('adds the translator only when enabled', () => {

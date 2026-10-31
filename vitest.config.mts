@@ -15,7 +15,8 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text-summary', 'json-summary'],
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/__tests__/**', 'src/types/**', '**/*.d.ts']
+      exclude: ['src/__tests__/**', 'src/types/**', '**/*.d.ts'],
+      thresholds: { functions: 90 }
     }
   }
 });

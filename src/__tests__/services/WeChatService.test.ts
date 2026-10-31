@@ -88,4 +88,33 @@ describe('WeChatService', () => {
     expect(AppService.post).toHaveBeenCalledTimes(1);
     expect(WechatJSSDK.mock.calls[0][0]).toMatchObject({ sig: 'c' });
   });
+
+  test('runWhenWXReady() requests every API the article page uses', async () => {
+    const service = await load();
+    await service.runWhenWXReady({ sig: 'a' });
+    expect(WechatJSSDK.mock.calls[0][0].jsApiList).toEqual(
+      expect.arrayContaining([
+        'updateAppMessageShareData',
+        'updateTimelineShareData',
+        'previewImage'
+      ])
+    );
+  });
+
+  test('runWhenWXReady() passes on a failed config request', async () => {
+    const service = await load();
+    vi.mocked(AppService.post).mockRejectedValue(new Error('down'));
+    await expect(service.runWhenWXReady()).rejects.toThrow('down');
+    expect(WechatJSSDK).not.toHaveBeenCalled();
+  });
+
+  // Current behaviour, reported as a bug: the empty check logs but does not
+  // return, so the next line dereferences null.
+  test('runWhenWXReady() throws when there is no WeChat object', async () => {
+    const service = await load();
+    vi.stubGlobal('window', undefined);
+    await expect(service.runWhenWXReady()).rejects.toThrow(TypeError);
+    expect(console.log).toHaveBeenCalledWith('XW is empty');
+    vi.unstubAllGlobals();
+  });
 });
