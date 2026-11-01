@@ -130,7 +130,9 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
         <div
           id={`article-content-${item.id}`}
           className={'content margin-bottom-md'}
-          dangerouslySetInnerHTML={{ __html: item.content || '' }}
+          dangerouslySetInnerHTML={{
+            __html: ItemService.prepareVideoHtml(item.content || '')
+          }}
           onClick={previewImage}
         />
         <div className={'article-end text-muted text-center'}>

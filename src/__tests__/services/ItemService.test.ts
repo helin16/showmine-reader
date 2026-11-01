@@ -49,6 +49,37 @@ describe('ItemService', () => {
     });
   });
 
+  describe('prepareVideoHtml()', () => {
+    test('plays videos inside the page on iPhones', () => {
+      const html = ItemService.prepareVideoHtml(
+        '<video poster="https://cdn.example/a.jpg" controls="controls"><source src="https://cdn.example/a.mp4"></video>'
+      );
+      expect(html).toBe(
+        '<video playsinline webkit-playsinline preload="metadata" poster="https://cdn.example/a.jpg" controls="controls"><source src="https://cdn.example/a.mp4"></video>'
+      );
+    });
+
+    test.each([
+      ['https://assets.jpgshowmine66.com/c/a.mp4'],
+      ['https://assets.showmine66.com/c/a.jpg']
+    ])('replaces the broken cover %s with an early frame', poster => {
+      const html = ItemService.prepareVideoHtml(
+        `<video poster="${poster}" controls="controls">\n<source src="https://assets.showmine66.com/c/a.mp4" type="video/mp4"></video>`
+      );
+      expect(html).not.toContain('poster');
+      expect(html).toContain('src="https://assets.showmine66.com/c/a.mp4#t=0.1"');
+    });
+
+    test('handles every video and leaves other content alone', () => {
+      const html = ItemService.prepareVideoHtml(
+        '<p>a</p><video></video><iframe src="https://v.qq.com/x"></iframe><video></video>'
+      );
+      expect(html.match(/<video playsinline /g)).toHaveLength(2);
+      expect(html).toContain('<p>a</p>');
+      expect(html).toContain('<iframe src="https://v.qq.com/x"></iframe>');
+    });
+  });
+
   describe('getCoverImageUrl()', () => {
     test('asks Cloudinary for a 300 pixel image', () => {
       expect(
