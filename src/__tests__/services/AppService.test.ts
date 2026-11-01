@@ -131,13 +131,20 @@ describe('AppService', () => {
   // Current behaviour, reported as a bug: unlike get(), these spread
   // getHeaders() over config, so headers passed by the caller are lost.
   test.each([
-    ['post', () => AppService.post('/a', {}, { headers: { comid: 'c1' } })],
     ['put', () => AppService.put('/a', {}, { headers: { comid: 'c1' } })]
   ] as const)('%s() drops headers passed in config', (method, call) => {
     call();
     expect(vi.mocked(axios[method]).mock.calls[0][2]?.headers).toStrictEqual(
       baseHeaders
     );
+  });
+
+  test('post() keeps headers passed in config', () => {
+    AppService.post('/a', {}, { headers: { Authorization: 'Bearer a' } });
+    expect(vi.mocked(axios.post).mock.calls[0][2]?.headers).toStrictEqual({
+      ...baseHeaders,
+      Authorization: 'Bearer a'
+    });
   });
 
   // Current behaviour, reported as a bug: getUploadHeaders() spreads the whole

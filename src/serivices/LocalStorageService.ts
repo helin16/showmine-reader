@@ -24,6 +24,27 @@ const removeToken = () => {
   }
 };
 
+// Not the token above, which AppService sends on every call.
+const COMMENT_TOKEN_NAME = 'commentToken';
+
+const getCommentToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(COMMENT_TOKEN_NAME);
+  }
+};
+
+const setCommentToken = (newToken: string) => {
+  if (typeof window !== 'undefined') {
+    return localStorage.setItem(COMMENT_TOKEN_NAME, newToken);
+  }
+};
+
+const removeCommentToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.removeItem(COMMENT_TOKEN_NAME);
+  }
+};
+
 const getJsSdk = () => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem(getJsConfigCache());
@@ -46,6 +67,10 @@ const LocalStorageService = {
   getToken,
   setToken,
   removeToken,
+
+  getCommentToken,
+  setCommentToken,
+  removeCommentToken,
 
   getJsSdk,
   setJsSdk,

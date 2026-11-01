@@ -21,6 +21,14 @@ describe('LocalStorageService', () => {
     expect(LocalStorageService.getToken()).toBeNull();
   });
 
+  test('keeps the comment token apart from the token sent on every call', () => {
+    LocalStorageService.setCommentToken('abc');
+    expect(LocalStorageService.getCommentToken()).toBe('abc');
+    expect(LocalStorageService.getToken()).toBeNull();
+    LocalStorageService.removeCommentToken();
+    expect(LocalStorageService.getCommentToken()).toBeNull();
+  });
+
   test('stores, reads and removes the JS SDK config under the default key', () => {
     LocalStorageService.setJsSdk('{"a":1}');
     expect(localStorage.getItem('jssdk')).toBe('{"a":1}');

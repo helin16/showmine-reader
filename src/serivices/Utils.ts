@@ -11,9 +11,15 @@ const getCurrentUrl = () => {
   return window.location.href;
 };
 
+// A full load, leaving no history entry.
+const goTo = (url: string) => {
+  window.location.replace(url);
+};
+
 const Utils = {
   stripHTMLTags,
-  getCurrentUrl
+  getCurrentUrl,
+  goTo
 };
 
 export default Utils;

@@ -71,10 +71,11 @@ const post = (
   params: iParams,
   config: AxiosRequestConfig = {}
 ) => {
+  const { headers, ...rest } = config;
   // @ts-ignore
   return axios.post(getEndPointUrl(url), params, {
-    ...config,
-    ...getHeaders()
+    ...rest,
+    ...getHeaders(headers)
   });
 };
 

@@ -18,6 +18,7 @@ type iItem = iBaseType & {
   Company?: iCompany;
   CoverAsset?: iAsset;
   enableGTranslateFlag: boolean;
+  enableCommentsFlag?: boolean;
 };
 
 export default iItem;
