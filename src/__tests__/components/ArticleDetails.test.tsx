@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import ArticleDetails from '@/components/Article/ArticleDetails';
 import WeChatService from '@/serivices/WeChatService';
@@ -126,15 +126,15 @@ describe('ArticleDetails', () => {
       const wx = makeWx();
       ready.mockResolvedValue({ wx });
       const view = render(<ArticleDetails item={item} {...props} />);
-      await screen.findByText(props.item?.title || item.title);
+      await act(async () => undefined);
       return { wx, ...view };
     };
 
-    test('shows a spinner until WeChat is ready', () => {
+    test('shows the article while WeChat never gets ready', () => {
       ready.mockReturnValue(new Promise(() => undefined));
       const { container } = render(<ArticleDetails item={item} />);
-      expect(container.querySelector('.spinner')).not.toBeNull();
-      expect(screen.queryByText('Hello')).not.toBeInTheDocument();
+      expect(container.querySelector('.spinner')).toBeNull();
+      expect(screen.getByText('Hello')).toBeInTheDocument();
     });
 
     test('passes on the server config', async () => {
@@ -197,58 +197,60 @@ describe('ArticleDetails', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => undefined);
       render(<ArticleDetails item={item} />);
-      await screen.findByText('Hello');
+      await act(async () => undefined);
+      expect(screen.getByText('Hello')).toBeInTheDocument();
       expect(consoleError).toHaveBeenCalledWith(error);
     });
 
-    // Current behaviour, reported as a bug: the handlers are bound while the
-    // spinner has replaced the article, so the selector matches nothing and the
-    // images that appear afterwards have no handler. A fix should flip this.
-    test('does not preview images in the rendered article', async () => {
+    test('previews the clicked image among all the article images', async () => {
       const { wx, container } = await renderShared({
-        item: { ...item, content: '<img src="https://x/1.png">' }
-      });
-      container.querySelector('img')!.click();
-      expect(wx.previewImage).not.toHaveBeenCalled();
-    });
-
-    // Because of the bug above, the click handler can only be reached through a
-    // node that outlives the spinner, so this one stands in for the article.
-    test('the preview handler opens the clicked image in the gallery', async () => {
-      const article = document.createElement('div');
-      article.id = 'article-content-1';
-      article.innerHTML = '<img src="https://x/2.png">';
-      document.body.appendChild(article);
-
-      const { wx } = await renderShared({
         item: {
           ...item,
           content:
             '<img alt="a" src="https://x/1.png" /><p>text</p><img src="https://x/2.png" class="b">'
         }
       });
-      article.querySelector('img')!.click();
-      article.remove();
-
-      await waitFor(() =>
-        expect(wx.previewImage).toHaveBeenCalledWith({
-          current: 'https://x/2.png',
-          urls: ['https://x/1.png', 'https://x/2.png']
-        })
-      );
+      fireEvent.click(container.querySelectorAll('img')[1]);
+      expect(wx.previewImage).toHaveBeenCalledWith({
+        current: 'https://x/2.png',
+        urls: ['https://x/1.png', 'https://x/2.png']
+      });
     });
 
-    test('passes an empty gallery when the content has no images', async () => {
-      const article = document.createElement('div');
-      article.id = 'article-content-1';
-      article.innerHTML = '<img src="https://x/2.png">';
-      document.body.appendChild(article);
+    test('previews the images of the next article in the same page', async () => {
+      const { wx, container, rerender } = await renderShared({
+        item: { ...item, content: '<img src="https://x/1.png">' }
+      });
+      rerender(
+        <ArticleDetails
+          item={{ ...item, id: '2', content: '<img src="https://x/2.png">' }}
+        />
+      );
+      fireEvent.click(container.querySelector('img')!);
+      expect(wx.previewImage).toHaveBeenCalledWith({
+        current: 'https://x/2.png',
+        urls: ['https://x/2.png']
+      });
+    });
 
-      const { wx } = await renderShared();
-      article.querySelector('img')!.click();
-      article.remove();
+    test('does not preview on a click beside an image', async () => {
+      const { wx } = await renderShared({
+        item: { ...item, content: '<p>Text</p><img src="https://x/1.png">' }
+      });
+      fireEvent.click(screen.getByText('Text'));
+      expect(wx.previewImage).not.toHaveBeenCalled();
+    });
 
-      expect(wx.previewImage.mock.calls[0][0].urls).toStrictEqual([]);
+    test('leaves a click alone until WeChat is ready', () => {
+      ready.mockReturnValue(new Promise(() => undefined));
+      const { container } = render(
+        <ArticleDetails
+          item={{ ...item, content: '<img src="https://x/1.png">' }}
+        />
+      );
+      expect(() =>
+        fireEvent.click(container.querySelector('img')!)
+      ).not.toThrow();
     });
   });
 });

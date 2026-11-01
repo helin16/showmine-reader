@@ -1,11 +1,9 @@
 import iItem from '@/types/iItem';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
 import WeChatService from '@/serivices/WeChatService';
 import ItemService from '@/serivices/ItemService';
 import Utils from '@/serivices/Utils';
-import Spinner from '@/components/Spinner';
-import jQuery from 'jquery';
 
 type iArticleDetails = {
   item: iItem;
@@ -14,39 +12,19 @@ type iArticleDetails = {
 
 const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
   const [isInWeChat, setIsInWeChat] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const wxRef = useRef<any>(null);
 
   useEffect(() => {
     setIsInWeChat(WeChatService.isInWeChat());
   }, []);
 
   useEffect(() => {
-    const contentStr = `${item?.content || ''}`.trim();
-    if (contentStr === '') {
-      return;
-    }
-    // @ts-ignore
-    setImageUrls(
-      (contentStr.match(/<img [^>]*src="[^"]*"[^>]*>/gm) || []).map(x =>
-        x.replace(/.*src="([^"]*)".*/, '$1')
-      )
-    );
-  }, [item?.content]);
-
-  useEffect(() => {
     if (isInWeChat !== true) {
       return;
     }
-    setIsLoading(true);
     WeChatService.runWhenWXReady(jsConfig)
       .then(({ wx }) => {
-        jQuery(`#article-content-${item.id} img`).on('click', e => {
-          wx.previewImage({
-            current: jQuery(e.target).attr('src'), // 当前显示图片的http链接
-            urls: imageUrls // 需要预览的图片http链接列表
-          });
-        });
+        wxRef.current = wx;
         wx.updateAppMessageShareData({
           type: 'link',
           title: item.title,
@@ -75,11 +53,21 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
       })
       .catch(err => {
         console.error(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   }, [isInWeChat]);
+
+  const previewImage = (e: MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLImageElement;
+    if (!wxRef.current || target.tagName !== 'IMG') {
+      return;
+    }
+    wxRef.current.previewImage({
+      current: target.src, // 当前显示图片的http链接
+      urls: Array.from(e.currentTarget.querySelectorAll('img')).map(
+        img => img.src
+      ) // 需要预览的图片http链接列表
+    });
+  };
 
   const getAuthorUrl = () => {
     const url = `${item.Author?.url || ''}`.trim();
@@ -122,10 +110,6 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
     );
   };
 
-  if (isLoading === true) {
-    return <Spinner />;
-  }
-
   return (
     <div className={'article-details-wrapper'}>
       <div className={'header margin-bottom-md'}>
@@ -146,6 +130,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
           id={`article-content-${item.id}`}
           className={'content margin-bottom-md'}
           dangerouslySetInnerHTML={{ __html: item.content || '' }}
+          onClick={previewImage}
         />
         <div className={'article-end text-muted text-center'}>
           <small>- END -</small>
