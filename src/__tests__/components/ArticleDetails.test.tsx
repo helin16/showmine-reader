@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import ArticleDetails from '@/components/Article/ArticleDetails';
 import WeChatService from '@/serivices/WeChatService';
 
-vi.mock('wechat-jssdk/dist/client.umd', () => ({ default: vi.fn() }));
-
 // No offset, so moment reads and prints it the same in every time zone.
 const item: any = {
   id: '1',

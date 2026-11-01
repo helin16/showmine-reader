@@ -1,10 +1,9 @@
 import AppService, { iConfigParams } from '@/serivices/AppService';
-// @ts-ignore
-import WechatJSSDK from 'wechat-jssdk/dist/client.umd';
 import LocalStorageService from '@/serivices/LocalStorageService';
 
 const endPoint = '/weChat';
-let wechatObj: any = null;
+const WX_SCRIPT_URL = 'https://res.wx.qq.com/open/js/jweixin-1.4.0.js';
+let wxConfig: any = null;
 
 const getWeChatJsConfig = (
   url: string,
@@ -15,8 +14,8 @@ const getWeChatJsConfig = (
     resp => resp.data
   );
 
-const getWX = async (jsConfig?: any) => {
-  if (window && !wechatObj) {
+const getWXConfig = async (jsConfig?: any) => {
+  if (window && !wxConfig) {
     // const localJsSDk = `${LocalStorageService.getJsSdk() || ''}`.trim();
     console.log('jsConfig', jsConfig);
     let result: any = jsConfig;
@@ -55,25 +54,54 @@ const getWX = async (jsConfig?: any) => {
         'showOptionMenu',
         'closeWindow',
         'scanQRCode',
-        'chooseWXPay'
+        'chooseWXPay',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage'
       ]
     };
     console.log('configObj', configObj);
-    wechatObj = new WechatJSSDK(configObj);
+    wxConfig = configObj;
   }
-  return wechatObj;
+  return wxConfig;
 };
+
+// Loading the file again does nothing, so only a failed load is tried again.
+const loadWXScript = () =>
+  new Promise<void>((resolve, reject) => {
+    if ((window as any).wx) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = reject;
+    script.src = WX_SCRIPT_URL;
+    document.head.appendChild(script);
+  });
+
+const configureWX = (config: any) =>
+  new Promise<any>((resolve, reject) => {
+    const { wx } = window as any;
+    if (!wx) {
+      reject(new Error('wx js not defined'));
+      return;
+    }
+    wx.config(config);
+    wx.ready(() => resolve({ wx }));
+    wx.error(reject);
+  });
 
 const isInWeChat = () =>
   /(micromessenger|webbrowser)/.test(navigator.userAgent.toLocaleLowerCase());
 
 const runWhenWXReady = async (jsConfig?: any) => {
-  const wx = await getWX(jsConfig);
-  if (!wx) {
+  const config = await getWXConfig(jsConfig);
+  if (!config) {
     console.log('XW is empty');
   }
-  console.log('wx', wx);
-  return wx.initialize();
+  await loadWXScript();
+  return configureWX(config);
 };
 
 const getShareItemUrl = (itemId: string) => {
