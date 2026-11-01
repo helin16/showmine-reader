@@ -370,7 +370,7 @@ describe('ArticleDetails', () => {
       const { container } = render(
         <ArticleDetails
           item={article(
-            '<video poster="https://assets.showmine66.com/a.jpg" controls></video><video controls></video>'
+            '<video poster="https://assets.jpgshowmine66.com/a.mp4" controls></video><video controls></video>'
           )}
         />
       );

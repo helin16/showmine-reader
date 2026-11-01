@@ -59,9 +59,15 @@ describe('ItemService', () => {
       );
     });
 
+    test('keeps a real cover on the assets host', () => {
+      const html = ItemService.prepareVideoHtml(
+        '<video poster="https://assets.showmine66.com/c/a.jpg"></video>'
+      );
+      expect(html).toContain('poster="https://assets.showmine66.com/c/a.jpg"');
+    });
+
     test.each([
-      ['https://assets.jpgshowmine66.com/c/a.mp4'],
-      ['https://assets.showmine66.com/c/a.jpg']
+      ['https://assets.jpgshowmine66.com/c/a.mp4']
     ])('removes the broken cover %s', poster => {
       const html = ItemService.prepareVideoHtml(
         `<video poster="${poster}" controls="controls">\n<source src="https://assets.showmine66.com/c/a.mp4" type="video/mp4"></video>`

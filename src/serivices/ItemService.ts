@@ -33,8 +33,8 @@ const getCoverImageUrl = (item: iItem) => {
   return imgUrl.replace('/image/upload/', '/image/upload/w_300/');
 };
 
-// Files uploaded to S3 have no generated cover, and older articles stored a broken address for one.
-const BROKEN_POSTER = /\sposter=(["'])[^"']*(?:assets\.jpgshowmine66|assets\.showmine66)[^"']*\1/i;
+// Older articles stored a cover address with a host that does not exist.
+const BROKEN_POSTER = /\sposter=(["'])[^"']*assets\.jpgshowmine66[^"']*\1/i;
 
 const AUTOPLAY = /\sautoplay\b(?:=(?:"[^"]*"|'[^']*'|[^\s>]*))?/gi;
 
