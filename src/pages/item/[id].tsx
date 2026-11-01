@@ -2,6 +2,7 @@ import Page from '../../components/Page';
 import Header from '../../components/Header';
 import ItemService from '@/serivices/ItemService';
 import Page404 from '@/components/Page404';
+import ArticleComments from '@/components/Article/ArticleComments';
 import ArticleDetails from '@/components/Article/ArticleDetails';
 import ArticleFooter from '@/components/Article/ArticleFooter';
 import weChatService from '@/serivices/WeChatService';
@@ -38,6 +39,9 @@ const ItemDetailsPage = ({ item, config, isRateLimited }: any) => {
     return (
       <>
         <ArticleDetails item={item} jsConfig={config} />
+        {item.enableCommentsFlag === true ? (
+          <ArticleComments itemId={item.id} />
+        ) : null}
         <ArticleFooter company={item.Company} />
       </>
     );

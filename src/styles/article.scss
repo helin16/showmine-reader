@@ -124,3 +124,61 @@ $logoWidth: 15vw;
     }
   }
 }
+
+.article-comments {
+  margin: 1rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #eee;
+
+  .comments-title {
+    font-size: $fontSize + 2px;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment {
+    padding: 0.5rem 0;
+  }
+
+  .comment-author {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: $fontSize - 2px;
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+  }
+
+  .comment-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .comment-reply {
+    margin-top: 0.25rem;
+    padding-left: 1rem;
+    border-left: 2px solid #eee;
+  }
+
+  .comment-form {
+    margin-top: 1rem;
+
+    textarea {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      font: inherit;
+    }
+
+    button {
+      display: block;
+      margin-bottom: 0.5rem;
+      padding: 0.4rem 1rem;
+    }
+  }
+}

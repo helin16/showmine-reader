@@ -16,6 +16,9 @@ vi.mock('@/components/Article/ArticleDetails', () => ({
 vi.mock('@/components/Article/ArticleFooter', () => ({
   default: () => <div>footer</div>
 }));
+vi.mock('@/components/Article/ArticleComments', () => ({
+  default: ({ itemId }: any) => <div>comments:{itemId}</div>
+}));
 vi.mock('@/components/GTranslator', () => ({
   default: () => <div>translator</div>
 }));
@@ -198,6 +201,25 @@ describe('item page', () => {
         <ItemDetailsPage item={{ isPublished: true, enableGTranslateFlag: false }} />
       );
       expect(screen.queryByText('translator')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('comments', () => {
+    const item = { id: 'a', title: 'T', isPublished: true };
+
+    test('show under an article with comments on', () => {
+      render(<ItemDetailsPage item={{ ...item, enableCommentsFlag: true }} />);
+      expect(screen.getByText('comments:a')).toBeInTheDocument();
+    });
+
+    test.each([[false], [undefined]])('stay away when the flag is %s', (flag) => {
+      render(<ItemDetailsPage item={{ ...item, enableCommentsFlag: flag }} />);
+      expect(screen.queryByText(/comments:/)).not.toBeInTheDocument();
+    });
+
+    test('stay away from an unpublished article', () => {
+      render(<ItemDetailsPage item={{ ...item, isPublished: false, enableCommentsFlag: true }} />);
+      expect(screen.queryByText(/comments:/)).not.toBeInTheDocument();
     });
   });
 });
