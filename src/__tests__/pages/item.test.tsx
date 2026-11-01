@@ -61,7 +61,7 @@ describe('item page', () => {
         .mockImplementation(() => undefined);
       const result: any = await getServerSideProps({ params: { id: 'a' } });
       expect(result.props).toStrictEqual({ item: { id: 'a' }, config: null });
-      expect(consoleError).toHaveBeenCalledWith(error);
+      expect(consoleError).toHaveBeenCalledWith('signature');
       consoleError.mockRestore();
     });
 
@@ -74,6 +74,66 @@ describe('item page', () => {
         undefined,
         { timeout: expect.any(Number) }
       );
+    });
+
+    describe('rate limited', () => {
+      const limited = () =>
+        Object.assign(new Error('Request failed with status code 429'), {
+          response: { status: 429 },
+          config: { headers: { 'X-SHM-SERVER-KEY': 'server-key' } }
+        });
+
+      test('says so for the item, with the status of the failure', async () => {
+        vi.mocked(ItemService.getItemById).mockRejectedValue(limited());
+        vi.mocked(weChatService.getWeChatJsConfig).mockResolvedValue({});
+        vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const res = { statusCode: 200 };
+        const result: any = await getServerSideProps({
+          params: { id: 'a' },
+          res
+        });
+        expect(result.props).toStrictEqual({
+          item: {},
+          config: null,
+          isRateLimited: true
+        });
+        expect(res.statusCode).toBe(429);
+      });
+
+      test('keeps the article when only the WeChat config is limited', async () => {
+        vi.mocked(ItemService.getItemById).mockResolvedValue({
+          id: 'a'
+        } as any);
+        vi.mocked(weChatService.getWeChatJsConfig).mockRejectedValue(limited());
+        vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const res = { statusCode: 200 };
+        const result: any = await getServerSideProps({
+          params: { id: 'a' },
+          res
+        });
+        expect(result.props).toStrictEqual({ item: { id: 'a' }, config: null });
+        expect(res.statusCode).toBe(200);
+      });
+
+      // An axios error carries its request headers, so logging it would put the server key in the logs.
+      test.each([
+        ['item', ItemService.getItemById],
+        ['WeChat config', weChatService.getWeChatJsConfig]
+      ])('logs only the message for the %s', async (_name, call: any) => {
+        vi.mocked(ItemService.getItemById).mockResolvedValue({} as any);
+        vi.mocked(weChatService.getWeChatJsConfig).mockResolvedValue({});
+        call.mockRejectedValue(limited());
+        const consoleError = vi
+          .spyOn(console, 'error')
+          .mockImplementation(() => undefined);
+        await getServerSideProps({
+          params: { id: 'a' },
+          res: { statusCode: 200 }
+        });
+        expect(consoleError).toHaveBeenCalledExactlyOnceWith(
+          'Request failed with status code 429'
+        );
+      });
     });
 
     // undefined props are not serializable, which next dev rejects.
@@ -111,6 +171,12 @@ describe('item page', () => {
 
     // Current behaviour, reported as a bug: item.enableGTranslateFlag is read
     // without a guard, so the undefined check in getContent() cannot be reached.
+    test('shows the error page saying to wait when rate limited', () => {
+      render(<ItemDetailsPage item={{}} isRateLimited />);
+      expect(screen.getByText(/Too Many Requests/)).toBeInTheDocument();
+      expect(screen.queryByText(/Item Not Available/)).not.toBeInTheDocument();
+    });
+
     // getServerSideProps always passes an object, so this needs a direct render.
     test('throws instead of showing 404 when the item is undefined', () => {
       const consoleError = vi

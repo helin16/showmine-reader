@@ -10,8 +10,18 @@ import GTranslator from '@/components/GTranslator';
 // The API may never answer during a WeChat outage; the client retries for itself.
 const WE_CHAT_CONFIG_TIMEOUT_MS = 3000;
 
-const ItemDetailsPage = ({ item, config }: any) => {
+const ItemDetailsPage = ({ item, config, isRateLimited }: any) => {
   const getContent = () => {
+    if (isRateLimited === true) {
+      return (
+        <Page404
+          title={'Too Many Requests 访问过于频繁'}
+          description={
+            'Please wait a few minutes and try again. 请等待几分钟后重试。'
+          }
+        />
+      );
+    }
     if (item === undefined) {
       return <Page404 />;
     }
@@ -43,7 +53,8 @@ const ItemDetailsPage = ({ item, config }: any) => {
   );
 };
 
-export const getServerSideProps = async ({ params }: any) => {
+// Errors are logged by message only: an axios error carries its request headers, including the server key.
+export const getServerSideProps = async ({ params, res }: any) => {
   const { id } = params;
   let item = undefined;
   let config = null;
@@ -58,14 +69,18 @@ export const getServerSideProps = async ({ params }: any) => {
           timeout: WE_CHAT_CONFIG_TIMEOUT_MS
         })
         .catch(err => {
-          console.error(err);
+          console.error(err.message);
           return null;
         })
     ]);
     item = itemDetails;
     config = configObj;
-  } catch (err) {
-    console.error(err);
+  } catch (err: any) {
+    console.error(err.message);
+    if (err.response?.status === 429) {
+      res.statusCode = 429;
+      return { props: { item: {}, config: null, isRateLimited: true } };
+    }
   }
   return {
     props: {
