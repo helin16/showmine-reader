@@ -233,6 +233,15 @@ describe('ArticleDetails', () => {
       });
     });
 
+    test('shares the next article opened in the same page', async () => {
+      const { wx, rerender } = await renderShared();
+      rerender(<ArticleDetails item={{ ...item, id: '2', title: 'Next' }} />);
+      await act(async () => undefined);
+      expect(wx.updateAppMessageShareData).toHaveBeenLastCalledWith(
+        expect.objectContaining({ title: 'Next' })
+      );
+    });
+
     test('does not preview on a click beside an image', async () => {
       const { wx } = await renderShared({
         item: { ...item, content: '<p>Text</p><img src="https://x/1.png">' }

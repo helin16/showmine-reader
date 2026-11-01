@@ -54,7 +54,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
       .catch(err => {
         console.error(err);
       });
-  }, [isInWeChat]);
+  }, [isInWeChat, item.id]);
 
   const previewImage = (e: MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLImageElement;
