@@ -16,29 +16,31 @@ afterEach(() => {
 });
 
 describe('Header', () => {
-  const title = (container: HTMLElement) =>
-    container.querySelector('title')?.textContent;
-  const description = (container: HTMLElement) =>
-    container.querySelector('meta[name="description"]')?.getAttribute('content');
+  // React 19 moves title and meta tags into the document head.
+  const title = () => document.head.querySelector('title')?.textContent;
+  const description = () =>
+    document.head
+      .querySelector('meta[name="description"]')
+      ?.getAttribute('content');
 
   test('uses the given title and description', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_NAME', 'App');
-    const { container } = render(<Header title={'Hi'} description={'Desc'} />);
-    expect(title(container)).toBe('Hi');
-    expect(description(container)).toBe('Desc');
+    render(<Header title={'Hi'} description={'Desc'} />);
+    expect(title()).toBe('Hi');
+    expect(description()).toBe('Desc');
   });
 
   test('falls back to the app name, with an empty description', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_NAME', 'App');
-    const { container } = render(<Header />);
-    expect(title(container)).toBe('App');
-    expect(description(container)).toBe('');
+    render(<Header />);
+    expect(title()).toBe('App');
+    expect(description()).toBe('');
   });
 
   test('falls back to SHM without an app name', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_NAME', undefined);
-    const { container } = render(<Header />);
-    expect(title(container)).toBe('SHM');
+    render(<Header />);
+    expect(title()).toBe('SHM');
   });
 });
 

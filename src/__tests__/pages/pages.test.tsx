@@ -45,6 +45,7 @@ describe('app shell', () => {
     const { container } = render(<HomePage />);
     expect(screen.getByRole('heading')).toHaveTextContent('404');
     expect(container.firstChild).toHaveClass('home-page-wrapper');
-    expect(container.querySelector('title')).toHaveTextContent('SHM');
+    // React 19 moves the title into the document head.
+    expect(document.head.querySelector('title')).toHaveTextContent('SHM');
   });
 });
