@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import CommentService from '@/serivices/CommentService';
 import LocalStorageService from '@/serivices/LocalStorageService';
 import Utils from '@/serivices/Utils';
@@ -9,7 +9,7 @@ import iComment from '@/types/iComment';
 const MAX_LENGTH = 1000;
 
 const CommentRow = ({ comment }: { comment: iComment }) => (
-  <div className={'comment'}>
+  <div className={'comment'} id={`comment-${comment.id}`}>
     <div className={'comment-author'}>
       {comment.authorAvatarUrl ? (
         <img className={'avatar'} src={comment.authorAvatarUrl} alt={''} />
@@ -44,6 +44,8 @@ const ArticleComments = ({ itemId }: { itemId: string }) => {
   const [text, setText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [notice, setNotice] = useState('');
+  const sectionRef = useRef<HTMLElement>(null);
+  const hasFollowedLink = useRef(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- both are only known after hydration
@@ -65,6 +67,29 @@ const ArticleComments = ({ itemId }: { itemId: string }) => {
       isCancelled = true;
     };
   }, [itemId]);
+
+  // The list isn't in the page when the browser looks for the hash, so this does what the browser would have.
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (!/^comment-.+/.test(hash) || hasFollowedLink.current) {
+      return;
+    }
+    if (comments === null && !loadFailed) {
+      return;
+    }
+    hasFollowedLink.current = true;
+    const comment = document.getElementById(hash);
+    const target = comment || sectionRef.current;
+    comment?.classList.add('comment-highlight');
+    target?.scrollIntoView({ block: 'center' });
+    if (document.readyState === 'complete') {
+      return;
+    }
+    // Images above load later and push the comment down.
+    const scrollAgain = () => target?.scrollIntoView({ block: 'center' });
+    window.addEventListener('load', scrollAgain, { once: true });
+    return () => window.removeEventListener('load', scrollAgain);
+  }, [comments, loadFailed]);
 
   const signIn = () => {
     setNotice('');
@@ -160,7 +185,7 @@ const ArticleComments = ({ itemId }: { itemId: string }) => {
   };
 
   return (
-    <section className={'article-comments'}>
+    <section className={'article-comments'} ref={sectionRef}>
       <div className={'comments-title'}>评论 Comments</div>
       {getList()}
       <div className={'comment-form'}>

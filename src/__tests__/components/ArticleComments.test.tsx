@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import ArticleComments from '@/components/Article/ArticleComments';
 import CommentService from '@/serivices/CommentService';
 import LocalStorageService from '@/serivices/LocalStorageService';
@@ -171,6 +171,91 @@ describe('ArticleComments', () => {
 
       expect(await screen.findByText(text)).toBeInTheDocument();
       expect(box()).toHaveValue('Mine');
+    });
+  });
+
+  describe('opening a link to a comment', () => {
+    let scrolled: any[];
+
+    beforeEach(() => {
+      scrolled = [];
+      Element.prototype.scrollIntoView = vi.fn(function (this: Element) {
+        scrolled.push(this);
+      });
+    });
+
+    afterEach(() => {
+      window.history.replaceState({}, '', '/');
+    });
+
+    const open = async (hash: string) => {
+      window.history.replaceState({}, '', `/item/a${hash}`);
+      const view = render(<ArticleComments itemId="a" />);
+      await screen.findByText('Nice post');
+      return view;
+    };
+
+    test('every comment and reply has an id to link to', async () => {
+      const { container } = await open('');
+      expect(container.querySelector('#comment-c1')).toHaveTextContent('Nice post');
+      expect(container.querySelector('#comment-r1')).toHaveTextContent('Thanks');
+    });
+
+    test('scrolls to the comment and highlights it once loaded', async () => {
+      const { container } = await open('#comment-c1');
+      const target = container.querySelector('#comment-c1');
+
+      expect(scrolled).toStrictEqual([target]);
+      expect(target).toHaveClass('comment-highlight');
+    });
+
+    test('finds a reply too', async () => {
+      const { container } = await open('#comment-r1');
+      expect(scrolled).toStrictEqual([container.querySelector('#comment-r1')]);
+    });
+
+    test('a comment that is not listed shows the comments section', async () => {
+      const { container } = await open('#comment-old');
+
+      expect(scrolled).toStrictEqual([container.querySelector('.article-comments')]);
+      expect(container.querySelector('.comment-highlight')).not.toBeInTheDocument();
+    });
+
+    test('shows the section when the list fails too', async () => {
+      vi.mocked(CommentService.getAll).mockRejectedValue(new Error('down'));
+      window.history.replaceState({}, '', '/item/a#comment-c1');
+      const { container } = render(<ArticleComments itemId="a" />);
+      await screen.findByText(/暂时无法加载/);
+
+      expect(scrolled).toStrictEqual([container.querySelector('.article-comments')]);
+    });
+
+    test.each([[''], ['#top'], ['#comment-']])('leaves the page alone for the hash %j', async hash => {
+      await open(hash);
+      expect(scrolled).toStrictEqual([]);
+    });
+
+    test('a comment added afterwards does not scroll again', async () => {
+      LocalStorageService.setCommentToken('tok');
+      vi.mocked(CommentService.create).mockResolvedValue({ ...comment, id: 'c2', text: 'Mine', replies: [] } as any);
+      await open('#comment-c1');
+
+      fireEvent.change(box(), { target: { value: 'Mine' } });
+      send();
+      await screen.findByText('Mine', { selector: '.comment-text' });
+
+      expect(scrolled).toHaveLength(1);
+    });
+
+    test('scrolls again when a slow page finishes, as images above move the comment', async () => {
+      const readyState = vi.spyOn(document, 'readyState', 'get').mockReturnValue('loading');
+      await open('#comment-c1');
+      expect(scrolled).toHaveLength(1);
+
+      readyState.mockRestore();
+      window.dispatchEvent(new Event('load'));
+
+      expect(scrolled).toHaveLength(2);
     });
   });
 });

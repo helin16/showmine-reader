@@ -125,6 +125,15 @@ $logoWidth: 15vw;
   }
 }
 
+@keyframes comment-highlight {
+  from {
+    background-color: #fff3bf;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
 .article-comments {
   margin: 1rem 0;
   padding: 1rem 0;
@@ -137,6 +146,10 @@ $logoWidth: 15vw;
 
   .comment {
     padding: 0.5rem 0;
+  }
+
+  .comment-highlight {
+    animation: comment-highlight 3s ease-out;
   }
 
   .comment-author {
