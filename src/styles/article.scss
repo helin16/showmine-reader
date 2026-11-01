@@ -15,6 +15,51 @@ $logoWidth: 15vw;
     iframe {
       max-width: 100% !important;
     }
+    .video-cover {
+      position: relative;
+      padding-top: 56.25%;
+      background-color: #111;
+      line-height: normal;
+      video,
+      button,
+      .video-cover-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      video {
+        object-fit: contain;
+      }
+      .video-cover-image {
+        object-fit: cover;
+      }
+      button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      svg {
+        position: relative;
+        width: 68px;
+        height: 48px;
+      }
+      .video-cover-message {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        padding: 0.5rem 1rem;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: $fontSize - 2px;
+        text-align: center;
+        pointer-events: none;
+      }
+    }
   }
 
   .header {

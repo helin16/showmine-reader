@@ -3,6 +3,9 @@ import moment from 'moment';
 import { MouseEvent, useEffect, useRef, useState } from 'react';
 import WeChatService from '@/serivices/WeChatService';
 import ItemService from '@/serivices/ItemService';
+import VideoCoverService, {
+  COVER_IMAGE_CLASS
+} from '@/serivices/VideoCoverService';
 import Utils from '@/serivices/Utils';
 
 type iArticleDetails = {
@@ -13,6 +16,7 @@ type iArticleDetails = {
 const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
   const [isInWeChat, setIsInWeChat] = useState(false);
   const wxRef = useRef<any>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the user agent is only known after hydration
@@ -57,16 +61,27 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
       });
   }, [isInWeChat, item.id]);
 
+  useEffect(
+    () => VideoCoverService.setup(contentRef.current as HTMLDivElement),
+    [item.id, item.content]
+  );
+
   const previewImage = (e: MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLImageElement;
-    if (!wxRef.current || target.tagName !== 'IMG') {
+    if (
+      !wxRef.current ||
+      target.tagName !== 'IMG' ||
+      target.classList.contains(COVER_IMAGE_CLASS)
+    ) {
       return;
     }
     wxRef.current.previewImage({
       current: target.src, // 当前显示图片的http链接
-      urls: Array.from(e.currentTarget.querySelectorAll('img')).map(
-        img => img.src
-      ) // 需要预览的图片http链接列表
+      urls: Array.from(
+        e.currentTarget.querySelectorAll<HTMLImageElement>(
+          `img:not(.${COVER_IMAGE_CLASS})`
+        )
+      ).map(img => img.src) // 需要预览的图片http链接列表
     });
   };
 
@@ -129,6 +144,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
         {/*// @ts-ignore*/}
         <div
           id={`article-content-${item.id}`}
+          ref={contentRef}
           className={'content margin-bottom-md'}
           dangerouslySetInnerHTML={{
             __html: ItemService.prepareVideoHtml(item.content || '')

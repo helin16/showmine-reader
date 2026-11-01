@@ -55,19 +55,43 @@ describe('ItemService', () => {
         '<video poster="https://cdn.example/a.jpg" controls="controls"><source src="https://cdn.example/a.mp4"></video>'
       );
       expect(html).toBe(
-        '<video playsinline webkit-playsinline preload="metadata" poster="https://cdn.example/a.jpg" controls="controls"><source src="https://cdn.example/a.mp4"></video>'
+        '<video playsinline webkit-playsinline preload="none" poster="https://cdn.example/a.jpg" controls="controls"><source src="https://cdn.example/a.mp4"></video>'
       );
     });
 
     test.each([
       ['https://assets.jpgshowmine66.com/c/a.mp4'],
       ['https://assets.showmine66.com/c/a.jpg']
-    ])('replaces the broken cover %s with an early frame', poster => {
+    ])('removes the broken cover %s', poster => {
       const html = ItemService.prepareVideoHtml(
         `<video poster="${poster}" controls="controls">\n<source src="https://assets.showmine66.com/c/a.mp4" type="video/mp4"></video>`
       );
       expect(html).not.toContain('poster');
-      expect(html).toContain('src="https://assets.showmine66.com/c/a.mp4#t=0.1"');
+      expect(html).toContain('src="https://assets.showmine66.com/c/a.mp4"');
+    });
+
+    test.each([
+      ['autoplay'],
+      ['autoplay="autoplay"'],
+      ["autoplay='true'"],
+      ['autoplay=1']
+    ])('removes %s, so nothing plays before a tap', attribute => {
+      const html = ItemService.prepareVideoHtml(
+        `<video ${attribute} controls="controls"></video>`
+      );
+      expect(html).toBe(
+        '<video playsinline webkit-playsinline preload="none" controls="controls"></video>'
+      );
+    });
+
+    test('the first preload wins over a stored one', () => {
+      const html = ItemService.prepareVideoHtml(
+        '<video preload="auto"></video>'
+      );
+      const video = new DOMParser()
+        .parseFromString(html, 'text/html')
+        .querySelector('video')!;
+      expect(video.preload).toBe('none');
     });
 
     test('handles every video and leaves other content alone', () => {
