@@ -151,10 +151,7 @@ describe('ItemListUnderCompany', () => {
     expect(screen.queryByText('First')).not.toBeInTheDocument();
   });
 
-  // Current behaviour, reported as a bug: the effect sets isCanceled in its
-  // cleanup but never reads it, so a slow earlier response overwrites a newer
-  // one. A fix should flip the last two assertions.
-  test('lets a stale response replace a newer one', async () => {
+  test('ignores a stale response that arrives after a newer one', async () => {
     const slow = deferred();
     const fast = deferred();
     getAll.mockReturnValueOnce(slow.promise).mockReturnValueOnce(fast.promise);
@@ -169,8 +166,42 @@ describe('ItemListUnderCompany', () => {
     await act(async () =>
       slow.resolve({ data: [{ ...item, id: 'old', title: 'Old' }] })
     );
-    expect(screen.getByText('Old')).toBeInTheDocument();
-    expect(screen.queryByText('New')).not.toBeInTheDocument();
+    expect(screen.getByText('New')).toBeInTheDocument();
+    expect(screen.queryByText('Old')).not.toBeInTheDocument();
+  });
+
+  test('keeps the spinner when a stale response arrives first', async () => {
+    const slow = deferred();
+    const fast = deferred();
+    getAll.mockReturnValueOnce(slow.promise).mockReturnValueOnce(fast.promise);
+    const { container, rerender } = render(
+      <ItemListUnderCompany companyId={'c1'} />
+    );
+    rerender(<ItemListUnderCompany companyId={'c2'} />);
+
+    await act(async () =>
+      slow.resolve({ data: [{ ...item, id: 'old', title: 'Old' }] })
+    );
+    expect(container.querySelector('.spinner')).not.toBeNull();
+    expect(screen.queryByText('Old')).not.toBeInTheDocument();
+
+    await act(async () =>
+      fast.resolve({ data: [{ ...item, id: 'new', title: 'New' }] })
+    );
+    expect(container.querySelector('.spinner')).toBeNull();
+    expect(screen.getByText('New')).toBeInTheDocument();
+  });
+
+  test('clears the spinner when the company goes during a request', async () => {
+    const request = deferred();
+    getAll.mockReturnValue(request.promise);
+    const { container, rerender } = render(
+      <ItemListUnderCompany companyId={'c1'} />
+    );
+    rerender(<ItemListUnderCompany />);
+    await act(async () => request.resolve({ data: [item] }));
+    expect(container.querySelector('.spinner')).toBeNull();
+    expect(screen.queryByText('First')).not.toBeInTheDocument();
   });
 
   test('unmounting during a request is harmless', async () => {

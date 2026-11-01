@@ -22,6 +22,7 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
     let isCanceled = false;
     const companyIdStr = `${companyId || ''}`.trim();
     if (companyIdStr === '') {
+      setIsLoading(false);
       return;
     }
     setIsLoading(true);
@@ -36,6 +37,9 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
       })
     })
       .then(resp => {
+        if (isCanceled) {
+          return;
+        }
         if (pageNo <= 1) {
           setItemList(resp);
         } else {
@@ -49,7 +53,9 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
         console.error(err);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!isCanceled) {
+          setIsLoading(false);
+        }
       });
 
     return () => {
