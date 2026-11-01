@@ -5,8 +5,7 @@ import App from '@/pages/_app';
 import Document from '@/pages/_document';
 import HomePage from '@/pages/index';
 
-// The installed sass is too old for Vite's scss compiler, and styles are not
-// under test here.
+// Styles are not under test here.
 vi.mock('@/styles/globals.scss', () => ({}));
 vi.mock('@/styles/article.scss', () => ({}));
 vi.mock('@/styles/spinner.scss', () => ({}));
