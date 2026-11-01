@@ -46,6 +46,6 @@
     "form-data": "^4.0.4"
   },
   "engines": {
-    "node": "24.x"
+    "node": "26.x"
   }
 }
