@@ -154,4 +154,53 @@ describe('AppService', () => {
       }
     });
   });
+
+  describe('server key', () => {
+    const SERVER_KEY_HEADER = 'X-SHM-SERVER-KEY';
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    test.each([
+      ['get()', () => AppService.get('/item'), axios.get, 1],
+      ['post()', () => AppService.post('/x', {}), axios.post, 2],
+      ['put()', () => AppService.put('/x', {}), axios.put, 2],
+      ['delete()', () => AppService.delete('/x'), axios.delete, 1]
+    ])('%s sends it from the server', (_name, call, verb: any, configArg) => {
+      vi.stubGlobal('window', undefined);
+      vi.stubEnv('SHOWMINE_SERVER_KEY', ' server-key ');
+      call();
+      expect(verb.mock.lastCall[configArg].headers).toStrictEqual({
+        ...baseHeaders,
+        [SERVER_KEY_HEADER]: 'server-key'
+      });
+    });
+
+    test('is never sent from the browser', () => {
+      vi.stubEnv('SHOWMINE_SERVER_KEY', 'server-key');
+      AppService.get('/item');
+      expect(axios.get).toHaveBeenLastCalledWith(`${API}/item`, {
+        headers: baseHeaders
+      });
+    });
+
+    test('is left out until it is set', () => {
+      vi.stubGlobal('window', undefined);
+      vi.stubEnv('SHOWMINE_SERVER_KEY', undefined);
+      AppService.get('/item');
+      expect(axios.get).toHaveBeenLastCalledWith(`${API}/item`, {
+        headers: baseHeaders
+      });
+    });
+  });
+
+  test('passes a 429 on to the page, with no second try', async () => {
+    const limited = Object.assign(new Error('429'), {
+      response: { status: 429 }
+    });
+    vi.mocked(axios.get).mockClear().mockRejectedValueOnce(limited);
+    await expect(AppService.get('/item')).rejects.toBe(limited);
+    expect(axios.get).toHaveBeenCalledTimes(1);
+  });
 });

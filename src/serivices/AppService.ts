@@ -19,6 +19,15 @@ const getEndPointUrl = (url: string) => {
   return `${process.env.NEXT_PUBLIC_API_END_POINT}${url}`;
 };
 
+// Lets reader pages past the API's limit per address, as they all reach it from Vercel's shared ones.
+// Never NEXT_PUBLIC_: that would put it in the browser's code, and it would then be no secret.
+const getServerKeyHeader = () => {
+  const serverKey = `${process.env.SHOWMINE_SERVER_KEY || ''}`.trim();
+  return typeof window !== 'undefined' || serverKey === ''
+    ? {}
+    : { 'X-SHM-SERVER-KEY': serverKey };
+};
+
 const getHeaders = (extra = {}) => {
   const token = LocalStorageService.getToken();
   const authHeader =
@@ -27,6 +36,7 @@ const getHeaders = (extra = {}) => {
     headers: {
       [getHeaderAppTokenName()]: `${process.env.NEXT_PUBLIC_APP_TOKEN || ''}`,
       ...authHeader,
+      ...getServerKeyHeader(),
       ...extra
     }
   };
