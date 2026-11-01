@@ -1,16 +1,12 @@
 <!--
 Sync Impact Report
-- Version: 1.0.0 draft -> 1.1.0 proposed (all-change impact assessment across all repositories)
-- Principles added: mandatory three-repository impact assessment
-- Principles expanded: admin-originated feature changes and cross-repository coordination
-- Sections expanded: Development Workflow
-- Follow-up: obtain project-owner approval and replace the ratification-date TODO
+- Version: 1.1.0 proposed -> 1.2.0 ratified by the project owner on 2026-11-01
+- Stack updated: Next.js 13 -> Next.js 15
 -->
 
 # ShowMine Reader Constitution
 
-This proposed constitution governs the public ShowMine reader. It remains a draft
-until approved by the project owner.
+This constitution governs the public ShowMine reader.
 
 ## Core Principles
 
@@ -64,7 +60,7 @@ report any command that cannot run and why.
 
 ## Technical Constraints
 
-- The reader uses Next.js 13, React 18, and TypeScript. Changes MUST preserve the
+- The reader uses Next.js 15, React 18, and TypeScript. Changes MUST preserve the
   installed stack unless an approved migration explicitly changes it.
 - The reader is a public client of the ShowMine API; it MUST NOT take ownership of
   shared business rules, persistence, or server-side authorization.
@@ -104,4 +100,4 @@ MUST identify deviations and their justification. If this constitution conflicts
 a higher-priority security or platform requirement, that requirement takes precedence
 and the conflict MUST be documented.
 
-**Version**: 1.1.0 | **Ratified**: TODO (pending project-owner approval) | **Last Amended**: 2026-10-31
+**Version**: 1.2.0 | **Ratified**: 2026-11-01 | **Last Amended**: 2026-11-01
