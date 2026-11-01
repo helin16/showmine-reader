@@ -7,6 +7,9 @@ import ArticleFooter from '@/components/Article/ArticleFooter';
 import weChatService from '@/serivices/WeChatService';
 import GTranslator from '@/components/GTranslator';
 
+// The API may never answer during a WeChat outage; the client retries for itself.
+const WE_CHAT_CONFIG_TIMEOUT_MS = 3000;
+
 const ItemDetailsPage = ({ item, config }: any) => {
   const getContent = () => {
     if (item === undefined) {
@@ -43,14 +46,21 @@ const ItemDetailsPage = ({ item, config }: any) => {
 export const getServerSideProps = async ({ params }: any) => {
   const { id } = params;
   let item = undefined;
-  let config = undefined;
+  let config = null;
   try {
     const [itemDetails, configObj] = await Promise.all([
       ItemService.getItemById(id, {
         include: 'CoverAsset,Author,Company.LogoAsset',
         isVisit: '1'
       }),
-      weChatService.getWeChatJsConfig(weChatService.getItemCurrentUrl(id))
+      weChatService
+        .getWeChatJsConfig(weChatService.getItemCurrentUrl(id), undefined, {
+          timeout: WE_CHAT_CONFIG_TIMEOUT_MS
+        })
+        .catch(err => {
+          console.error(err);
+          return null;
+        })
     ]);
     item = itemDetails;
     config = configObj;

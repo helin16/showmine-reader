@@ -52,10 +52,33 @@ describe('item page', () => {
       }
     );
 
-    // Current behaviour, reported as a bug: Promise.all ties the article to the
-    // WeChat signature, so a WeChat outage hides a valid article.
-    test('loses the item when only the WeChat config fails', async () => {
+    test('keeps the item when only the WeChat config fails', async () => {
       vi.mocked(ItemService.getItemById).mockResolvedValue({ id: 'a' } as any);
+      const error = new Error('signature');
+      vi.mocked(weChatService.getWeChatJsConfig).mockRejectedValue(error);
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+      const result: any = await getServerSideProps({ params: { id: 'a' } });
+      expect(result.props).toStrictEqual({ item: { id: 'a' }, config: null });
+      expect(consoleError).toHaveBeenCalledWith(error);
+      consoleError.mockRestore();
+    });
+
+    test('does not wait indefinitely for the WeChat config', async () => {
+      vi.mocked(ItemService.getItemById).mockResolvedValue({ id: 'a' } as any);
+      vi.mocked(weChatService.getWeChatJsConfig).mockResolvedValue({});
+      await getServerSideProps({ params: { id: 'a' } });
+      expect(weChatService.getWeChatJsConfig).toHaveBeenLastCalledWith(
+        undefined,
+        undefined,
+        { timeout: expect.any(Number) }
+      );
+    });
+
+    // undefined props are not serializable, which next dev rejects.
+    test('returns a null config when both requests fail', async () => {
+      vi.mocked(ItemService.getItemById).mockRejectedValue(new Error('404'));
       vi.mocked(weChatService.getWeChatJsConfig).mockRejectedValue(
         new Error('signature')
       );
@@ -63,8 +86,7 @@ describe('item page', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => undefined);
       const result: any = await getServerSideProps({ params: { id: 'a' } });
-      expect(result.props.item).toStrictEqual({});
-      expect(consoleError).toHaveBeenCalledTimes(1);
+      expect(result.props).toStrictEqual({ item: {}, config: null });
       consoleError.mockRestore();
     });
   });
