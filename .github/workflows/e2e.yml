@@ -1,0 +1,33 @@
+name: E2E
+
+# Reads production after each deployment: it never signs in, writes nothing, and needs no secrets.
+# Article checks are skipped until the E2E_ARTICLE_ID repository variable names a published article with a video.
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-production
+  cancel-in-progress: false
+
+jobs:
+  production:
+    if: >-
+      github.event_name != 'deployment_status' ||
+      (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    # Comes with the browser, so a slow Ubuntu mirror cannot stall the run. Keep in step with @playwright/test.
+    container: mcr.microsoft.com/playwright:v1.64.1-noble
+    timeout-minutes: 10
+    env:
+      E2E_ARTICLE_ID: ${{ vars.E2E_ARTICLE_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - run: npx -y yarn@1.22.22 install --frozen-lockfile
+      - run: npx playwright test --config e2e/playwright.config.ts
