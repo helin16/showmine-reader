@@ -6,7 +6,6 @@ import ItemService from '@/serivices/ItemService';
 import VideoCoverService, {
   COVER_IMAGE_CLASS
 } from '@/serivices/VideoCoverService';
-import Utils from '@/serivices/Utils';
 
 type iArticleDetails = {
   item: iItem;
@@ -35,11 +34,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
           title: item.title,
           link: WeChatService.getShareItemUrl(item.id),
           imgUrl: ItemService.getCoverImageUrl(item),
-          desc: Utils.stripHTMLTags(
-            `${item.excerpt || ''}`.trim() === ''
-              ? `${item.content || ''}`.trim()
-              : `${item.excerpt || ''}`.trim()
-          ),
+          desc: ItemService.getShareDescription(item),
           success: () => {
             console.log('updateAppMessageShareData loaded');
           }

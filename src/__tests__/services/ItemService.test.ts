@@ -142,4 +142,29 @@ describe('ItemService', () => {
       expect(ItemService.getCoverImageUrl({} as any)).toBe('/default.png');
     });
   });
+
+  describe('getShareDescription()', () => {
+    test('prefers the excerpt, without tags or spare spaces', () => {
+      expect(
+        ItemService.getShareDescription({
+          excerpt: ' <p>One&nbsp;two\n three</p> ',
+          content: 'Body'
+        } as any)
+      ).toBe('One two three');
+    });
+
+    test('falls back to the content, then to nothing', () => {
+      expect(
+        ItemService.getShareDescription({ content: '<p>Body</p>' } as any)
+      ).toBe('Body');
+      expect(ItemService.getShareDescription({} as any)).toBe('');
+    });
+
+    test('keeps a card short, without cutting a character in half', () => {
+      const text = '😀'.repeat(201);
+      expect(ItemService.getShareDescription({ excerpt: text } as any)).toBe(
+        '😀'.repeat(200)
+      );
+    });
+  });
 });

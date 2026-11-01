@@ -37,6 +37,45 @@ describe('Header', () => {
     expect(description()).toBe('');
   });
 
+  describe('share card', () => {
+    const meta = (key: string) =>
+      document.head
+        .querySelector(`meta[property="${key}"], meta[name="${key}"]`)
+        ?.getAttribute('content');
+
+    test('describes the page, keeping article text as plain text', () => {
+      const title = 'A "quoted" <b>title</b> & more';
+      render(
+        <Header
+          title={title}
+          description={'Desc'}
+          image={'https://c.example/a.png'}
+          url={'https://reader.example/item/a'}
+        />
+      );
+      expect(meta('og:title')).toBe(title);
+      expect(meta('og:description')).toBe('Desc');
+      expect(meta('og:image')).toBe('https://c.example/a.png');
+      expect(meta('og:url')).toBe('https://reader.example/item/a');
+      expect(meta('twitter:card')).toBe('summary');
+    });
+
+    test('falls back to the logo, with no address for the page', () => {
+      vi.stubEnv('NEXT_PUBLIC_READER_BASE_URL', 'https://reader.example');
+      render(<Header />);
+      expect(meta('og:image')).toBe('https://reader.example/logo.png');
+      expect(meta('og:url')).toBeUndefined();
+    });
+
+    test.each([
+      ['http://c.example/a.png'],
+      ['//c.example/a.png']
+    ])('makes %s https', image => {
+      render(<Header image={image} />);
+      expect(meta('og:image')).toBe('https://c.example/a.png');
+    });
+  });
+
   test('falls back to SHM without an app name', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_NAME', undefined);
     render(<Header />);

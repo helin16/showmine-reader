@@ -10,6 +10,8 @@ import GTranslator from '@/components/GTranslator';
 
 // The API may never answer during a WeChat outage; the client retries for itself.
 const WE_CHAT_CONFIG_TIMEOUT_MS = 3000;
+// Sent by e2e/playwright.config.ts: the check after each deployment must not change production.
+const E2E_USER_AGENT = 'ShowMine-E2E';
 
 const ItemDetailsPage = ({ item, config, isRateLimited }: any) => {
   const getContent = () => {
@@ -47,10 +49,17 @@ const ItemDetailsPage = ({ item, config, isRateLimited }: any) => {
     );
   };
 
+  const shareCard =
+    item?.isPublished === true
+      ? {
+          description: ItemService.getShareDescription(item),
+          image: ItemService.getCoverImageUrl(item),
+          url: weChatService.getItemCurrentUrl(item.id)
+        }
+      : undefined;
+
   return (
-    <Page
-      header={<Header title={item?.title} description={item?.description} />}
-    >
+    <Page header={<Header title={item?.title} {...shareCard} />}>
       {item.enableGTranslateFlag === true ? <GTranslator /> : null}
       <div>{getContent()}</div>
     </Page>
@@ -58,7 +67,7 @@ const ItemDetailsPage = ({ item, config, isRateLimited }: any) => {
 };
 
 // Errors are logged by message only: an axios error carries its request headers, including the server key.
-export const getServerSideProps = async ({ params, res }: any) => {
+export const getServerSideProps = async ({ params, req, res }: any) => {
   const { id } = params;
   let item = undefined;
   let config = null;
@@ -66,7 +75,9 @@ export const getServerSideProps = async ({ params, res }: any) => {
     const [itemDetails, configObj] = await Promise.all([
       ItemService.getItemById(id, {
         include: 'CoverAsset,Author,Company.LogoAsset',
-        isVisit: '1'
+        ...(req?.headers['user-agent'] === E2E_USER_AGENT
+          ? {}
+          : { isVisit: '1' })
       }),
       weChatService
         .getWeChatJsConfig(weChatService.getItemCurrentUrl(id), undefined, {

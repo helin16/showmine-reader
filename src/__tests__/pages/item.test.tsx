@@ -5,7 +5,11 @@ import ItemService from '@/serivices/ItemService';
 import weChatService from '@/serivices/WeChatService';
 
 vi.mock('@/serivices/ItemService', () => ({
-  default: { getItemById: vi.fn() }
+  default: {
+    getItemById: vi.fn(),
+    getCoverImageUrl: vi.fn(),
+    getShareDescription: vi.fn()
+  }
 }));
 vi.mock('@/serivices/WeChatService', () => ({
   default: { getWeChatJsConfig: vi.fn(), getItemCurrentUrl: vi.fn() }
@@ -23,12 +27,36 @@ vi.mock('@/components/GTranslator', () => ({
   default: () => <div>translator</div>
 }));
 vi.mock('../../components/Page', () => ({
-  default: ({ children }: any) => <div>{children}</div>
+  default: ({ header, children }: any) => (
+    <div>
+      {header}
+      {children}
+    </div>
+  )
 }));
-vi.mock('../../components/Header', () => ({ default: () => null }));
+vi.mock('../../components/Header', () => ({
+  default: ({ image, url }: any) => (
+    <div>
+      card:{image}:{url}
+    </div>
+  )
+}));
 
 describe('item page', () => {
   describe('getServerSideProps()', () => {
+    test('does not count a visit from the end-to-end check', async () => {
+      vi.mocked(ItemService.getItemById).mockResolvedValue({ id: 'a' } as any);
+      vi.mocked(weChatService.getWeChatJsConfig).mockResolvedValue({});
+      await getServerSideProps({
+        params: { id: 'a' },
+        req: { headers: { 'user-agent': 'ShowMine-E2E' } }
+      });
+      expect(ItemService.getItemById).toHaveBeenLastCalledWith(
+        'a',
+        expect.not.objectContaining({ isVisit: expect.anything() })
+      );
+    });
+
     test('loads the item and WeChat config, and counts a visit', async () => {
       vi.mocked(ItemService.getItemById).mockResolvedValue({ id: 'a' } as any);
       vi.mocked(weChatService.getWeChatJsConfig).mockResolvedValue({ s: 1 });
@@ -155,6 +183,20 @@ describe('item page', () => {
   });
 
   describe('rendering', () => {
+    test('shares a published article with its cover', () => {
+      vi.mocked(ItemService.getCoverImageUrl).mockReturnValue('cover');
+      vi.mocked(weChatService.getItemCurrentUrl).mockReturnValue('address');
+      render(<ItemDetailsPage item={{ id: 'a', isPublished: true }} />);
+      expect(screen.getByText('card:cover:address')).toBeInTheDocument();
+    });
+
+    test('shares nothing of an article that is not published', () => {
+      vi.mocked(ItemService.getShareDescription).mockClear();
+      render(<ItemDetailsPage item={{ title: 'Secret', isPublished: false }} />);
+      expect(screen.getByText('card::')).toBeInTheDocument();
+      expect(ItemService.getShareDescription).not.toHaveBeenCalled();
+    });
+
     test('shows a published article', () => {
       render(
         <ItemDetailsPage item={{ title: 'Hello', isPublished: true }} />

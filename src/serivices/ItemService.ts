@@ -1,6 +1,7 @@
 import AppService, { iConfigParams } from '@/serivices/AppService';
 import iItem from '@/types/iItem';
 import iResList from '@/types/iResList';
+import Utils from '@/serivices/Utils';
 
 const endPoint = '/item';
 const getItemById = async (
@@ -33,6 +34,20 @@ const getCoverImageUrl = (item: iItem) => {
   return imgUrl.replace('/image/upload/', '/image/upload/w_300/');
 };
 
+const SHARE_DESCRIPTION_LENGTH = 200;
+
+// ponytail: on the server only &nbsp; is decoded, other entities show as written. Decode them all if a card shows one.
+const getShareDescription = (item: iItem) => {
+  const excerpt = `${item.excerpt || ''}`.trim();
+  const text = Utils.stripHTMLTags(
+    excerpt === '' ? `${item.content || ''}`.trim() : excerpt
+  )
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return Array.from(text).slice(0, SHARE_DESCRIPTION_LENGTH).join('');
+};
+
 // Older articles stored a cover address with a host that does not exist.
 const BROKEN_POSTER = /\sposter=(["'])[^"']*assets\.jpgshowmine66[^"']*\1/i;
 
@@ -54,7 +69,8 @@ const ItemService = {
   prepareVideoHtml,
   getItemById,
   getAllItemsUnderCompany,
-  getCoverImageUrl
+  getCoverImageUrl,
+  getShareDescription
 };
 
 export default ItemService;
