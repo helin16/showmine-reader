@@ -22,6 +22,7 @@ const ItemListUnderCompany = ({ companyId }: iItemListUnderCompany) => {
     let isCanceled = false;
     const companyIdStr = `${companyId || ''}`.trim();
     if (companyIdStr === '') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clears a load left running for the previous company
       setIsLoading(false);
       return;
     }

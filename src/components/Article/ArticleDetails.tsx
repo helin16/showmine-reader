@@ -15,6 +15,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
   const wxRef = useRef<any>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the user agent is only known after hydration
     setIsInWeChat(WeChatService.isInWeChat());
   }, []);
 
