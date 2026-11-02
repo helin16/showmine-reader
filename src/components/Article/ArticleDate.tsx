@@ -8,6 +8,7 @@ const ArticleDate = ({ value }: { value: MomentInput }) => {
   const [text, setText] = useState(() => moment.utc(value).format(FORMAT));
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the reader's timezone is only known after hydration
     setText(moment(value).format(FORMAT));
   }, [value]);
 
