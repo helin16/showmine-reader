@@ -29,6 +29,7 @@ describe('security headers', () => {
     const scripts = await getDirective('script-src');
     expect(scripts).toContain('https://res.wx.qq.com');
     expect(scripts).toContain('https://translate-pa.googleapis.com');
+    expect(scripts).toContain("'sha256-");
     expect(scripts).toContain('https://translate.google.com');
     expect(scripts).toContain('https://translate.googleapis.com');
   });
