@@ -23,4 +23,4 @@ jobs:
       - run: npx -y yarn@1.22.22 lint
       - name: Unit tests with the 90% coverage gate
         run: npx -y yarn@1.22.22 test
-      - run: npx next build
+      - run: npx next build --webpack

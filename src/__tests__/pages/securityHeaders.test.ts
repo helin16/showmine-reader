@@ -9,7 +9,7 @@ const getHeaders = async () => {
 };
 const getDirective = async (name: string) => {
   const { headers } = await getHeaders();
-  return `${headers.get('Content-Security-Policy-Report-Only')}`
+  return `${headers.get('Content-Security-Policy')}`
     .split('; ')
     .find(part => part.startsWith(`${name} `));
 };
@@ -19,15 +19,16 @@ describe('security headers', () => {
     expect((await getHeaders()).source).toBe('/:path*');
   });
 
-  test('the content policy only reports for now', async () => {
+  test('the content policy is enforced', async () => {
     const { headers } = await getHeaders();
-    expect(headers.get('Content-Security-Policy')).toBeUndefined();
-    expect(headers.has('Content-Security-Policy-Report-Only')).toBe(true);
+    expect(headers.has('Content-Security-Policy')).toBe(true);
+    expect(headers.has('Content-Security-Policy-Report-Only')).toBe(false);
   });
 
   test('allows WeChat and the translator', async () => {
     const scripts = await getDirective('script-src');
     expect(scripts).toContain('https://res.wx.qq.com');
+    expect(scripts).toContain('https://translate-pa.googleapis.com');
     expect(scripts).toContain('https://translate.google.com');
     expect(scripts).toContain('https://translate.googleapis.com');
   });
