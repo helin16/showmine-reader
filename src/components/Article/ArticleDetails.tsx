@@ -1,8 +1,8 @@
 import iItem from '@/types/iItem';
-import moment from 'moment';
 import { MouseEvent, useEffect, useRef, useState } from 'react';
 import WeChatService from '@/serivices/WeChatService';
 import ItemService from '@/serivices/ItemService';
+import ArticleDate from './ArticleDate';
 import VideoCoverService, {
   COVER_IMAGE_CLASS
 } from '@/serivices/VideoCoverService';
@@ -129,7 +129,7 @@ const ArticleDetails = ({ item, jsConfig }: iArticleDetails) => {
           <div className={'left'}>
             {getAuthorDiv()}
             <div className={'text-muted'}>
-              {moment(item.publishedAt).format('YYYY-MM-DD HH:mm')}
+              <ArticleDate value={item.publishedAt} />
             </div>
           </div>
           <div className={'right text-muted'}>阅读: {item.noOfVisits}</div>
