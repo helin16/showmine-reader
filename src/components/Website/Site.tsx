@@ -25,7 +25,9 @@ const Site = ({ website, page, preview, articles }: iSite) => {
           : undefined
       }
     >
-      {preview ? <p className={'site-preview-note'}>Preview 预览</p> : null}
+      {preview || website.isPreview ? (
+        <p className={'site-preview-note'}>Preview 预览</p>
+      ) : null}
       <Nav website={website} currentSlug={page.slug} preview={preview} />
       <main className={'site-page'}>
         {page.sections.map(section => {

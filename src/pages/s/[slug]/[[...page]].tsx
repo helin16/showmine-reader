@@ -56,7 +56,7 @@ const WebsitePage = ({
           page.seo?.imageUrl || website.seo?.imageUrl || website.company.logoUrl
         }
       />
-      {preview ? (
+      {preview || website.isPreview ? (
         <Head>
           <meta name={'robots'} content={'noindex'} />
         </Head>

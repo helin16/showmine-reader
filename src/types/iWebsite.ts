@@ -24,6 +24,8 @@ export type iWebsite = {
   slug: string;
   companyId: string;
   isPreview?: boolean;
+  // Where its pages live: /s/<slug> by default, /t/<id> for a template preview.
+  basePath?: string;
   theme?: { primaryColor?: string; fontPair?: string };
   seo?: iWebsiteSeo;
   company: {

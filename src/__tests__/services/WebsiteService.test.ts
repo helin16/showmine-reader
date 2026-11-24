@@ -19,3 +19,17 @@ describe('WebsiteService.getPublicWebsite()', () => {
     });
   });
 });
+
+describe('WebsiteService.getPublicTemplate()', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  test('asks for the template by its id', async () => {
+    const get = vi
+      .spyOn(AppService, 'get')
+      .mockResolvedValue({ data: { pages: [] } } as any);
+    await expect(
+      WebsiteService.getPublicTemplate('a/b')
+    ).resolves.toStrictEqual({ pages: [] });
+    expect(get).toHaveBeenLastCalledWith('/publicTemplate/a%2Fb');
+  });
+});

@@ -213,6 +213,14 @@ describe('WebsiteService.getHref()', () => {
     ['/../x', undefined, undefined],
     [undefined, undefined, undefined]
   ])('%s with preview %s gives %s', (link, preview, expected) => {
-    expect(WebsiteService.getHref('shop', link, preview)).toBe(expected);
+    expect(WebsiteService.getHref({ slug: 'shop' }, link, preview)).toBe(
+      expected
+    );
+  });
+
+  test('a template preview links inside /t/<id>', () => {
+    expect(
+      WebsiteService.getHref({ slug: 'shop', basePath: '/t/shop' }, '/about')
+    ).toBe('/t/shop/about');
   });
 });

@@ -11,7 +11,7 @@ type iSection = {
 };
 
 export const Hero = ({ section, website, preview }: iSection) => {
-  const href = WebsiteService.getHref(website.slug, section.buttonUrl, preview);
+  const href = WebsiteService.getHref(website, section.buttonUrl, preview);
   return (
     <section
       className={`site-hero${section.imageUrl ? ' with-image' : ''}`}
