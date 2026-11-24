@@ -7,7 +7,13 @@ import { iWebsite } from '@/types/iWebsite';
 
 vi.mock('@/serivices/WebsiteService', async importOriginal => {
   const actual: any = await importOriginal();
-  return { default: { ...actual.default, getPublicWebsite: vi.fn() } };
+  return {
+    default: {
+      ...actual.default,
+      getPublicWebsite: vi.fn(),
+      countPageView: vi.fn()
+    }
+  };
 });
 vi.mock('@/serivices/ItemService', () => ({
   default: {
@@ -47,11 +53,17 @@ const website = (extra: Partial<iWebsite> = {}): iWebsite => ({
   ...extra
 });
 
-const run = async (slug: string, page?: string[], query: object = {}) => {
+const run = async (
+  slug: string,
+  page?: string[],
+  query: object = {},
+  userAgent = 'Mozilla/5.0'
+) => {
   const res = { statusCode: 200, setHeader: vi.fn() };
   const result: any = await getServerSideProps({
     params: { slug, page },
     query,
+    req: { headers: { 'user-agent': userAgent } },
     res
   });
   return { res, props: result.props };
@@ -60,6 +72,8 @@ const run = async (slug: string, page?: string[], query: object = {}) => {
 describe('website page', () => {
   beforeEach(() => {
     vi.mocked(WebsiteService.getPublicWebsite).mockResolvedValue(website());
+    vi.mocked(WebsiteService.countPageView).mockReset();
+    vi.mocked(WebsiteService.countPageView).mockResolvedValue({} as any);
     vi.mocked(ItemService.getAllItemsUnderCompany).mockResolvedValue({
       data: [{ id: 'i1', title: 'Event' }]
     } as any);
@@ -145,6 +159,77 @@ describe('website page', () => {
         'Referrer-Policy',
         'no-referrer'
       );
+    });
+  });
+
+  // US7 (T069): one view per published page shown, counted from the server.
+  describe('page views', () => {
+    test('a published page counts one view, the home page by its own name', async () => {
+      await run('shop');
+      await run('shop', ['news']);
+      expect(vi.mocked(WebsiteService.countPageView).mock.calls).toStrictEqual([
+        ['shop', 'home'],
+        ['shop', 'news']
+      ]);
+    });
+
+    test.each([
+      ['a preview', () => run('shop', undefined, { preview: 'abc' })],
+      [
+        'a copy the API marks as a preview',
+        () => {
+          vi.mocked(WebsiteService.getPublicWebsite).mockResolvedValue(
+            website({ isPreview: true })
+          );
+          return run('shop');
+        }
+      ],
+      [
+        "ShowMine's automated checks",
+        () => run('shop', undefined, {}, 'ShowMine-E2E')
+      ],
+      ['an unknown page', () => run('shop', ['missing'])],
+      [
+        'a website that fails to load',
+        () => {
+          vi.spyOn(console, 'error').mockImplementation(() => undefined);
+          vi.mocked(WebsiteService.getPublicWebsite).mockRejectedValue(
+            new Error('x')
+          );
+          return run('shop');
+        }
+      ]
+    ])('%s is not counted', async (_, show) => {
+      await show();
+      expect(WebsiteService.countPageView).not.toHaveBeenCalled();
+    });
+
+    test('a view that fails to count still shows the page, logging only the message', async () => {
+      const error = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+      vi.mocked(WebsiteService.countPageView).mockRejectedValue(
+        Object.assign(new Error('timeout of 1000ms exceeded'), {
+          config: { headers: { 'X-SHM-SERVER-KEY': 'secret' } }
+        })
+      );
+      const { props, res } = await run('shop', ['news']);
+      expect(props.page.slug).toBe('news');
+      expect(props.articles).toStrictEqual({
+        s1: [{ id: 'i1', title: 'Event' }]
+      });
+      expect(res.statusCode).toBe(200);
+      expect(error).toHaveBeenCalledWith('timeout of 1000ms exceeded');
+    });
+
+    test('works without a request, as when Next gives none', async () => {
+      const result: any = await getServerSideProps({
+        params: { slug: 'shop' },
+        query: {},
+        res: { statusCode: 200, setHeader: vi.fn() }
+      });
+      expect(result.props.page.slug).toBe('home');
+      expect(WebsiteService.countPageView).toHaveBeenCalledWith('shop', 'home');
     });
   });
 

@@ -7,7 +7,13 @@ import ItemService from '@/serivices/ItemService';
 // The template preview at /t/<id> (showmine-admin specs/001-website-builder, US4, T049).
 vi.mock('@/serivices/WebsiteService', async importOriginal => {
   const actual: any = await importOriginal();
-  return { default: { ...actual.default, getPublicTemplate: vi.fn() } };
+  return {
+    default: {
+      ...actual.default,
+      getPublicTemplate: vi.fn(),
+      countPageView: vi.fn()
+    }
+  };
 });
 vi.mock('@/serivices/ItemService', () => ({
   default: { getAllItemsUnderCompany: vi.fn(), getCoverImageUrl: () => '' }
@@ -94,6 +100,8 @@ describe('template preview page', () => {
     expect(hrefs.some(href => `${href}`.startsWith('/s/'))).toBe(false);
     // No company, so the articles section loads nothing.
     expect(ItemService.getAllItemsUnderCompany).not.toHaveBeenCalled();
+    // A template is not a website: no page view (US7).
+    expect(WebsiteService.countPageView).not.toHaveBeenCalled();
   });
 
   test('another page shows the sample contact details', async () => {

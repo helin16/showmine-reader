@@ -33,3 +33,17 @@ describe('WebsiteService.getPublicTemplate()', () => {
     expect(get).toHaveBeenLastCalledWith('/publicTemplate/a%2Fb');
   });
 });
+
+describe('WebsiteService.countPageView()', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  test('posts the page name, waiting 1 second at most', async () => {
+    const post = vi.spyOn(AppService, 'post').mockResolvedValue({} as any);
+    await WebsiteService.countPageView('a b', 'news');
+    expect(post).toHaveBeenLastCalledWith(
+      '/publicWebsite/a%20b/pageView',
+      { pageSlug: 'news' },
+      { timeout: 1000 }
+    );
+  });
+});

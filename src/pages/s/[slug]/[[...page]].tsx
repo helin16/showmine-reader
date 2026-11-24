@@ -10,6 +10,8 @@ import iItem from '@/types/iItem';
 import { iWebsite, iWebsitePage } from '@/types/iWebsite';
 
 // A company's website (showmine-admin specs/001-website-builder, contracts/reader-routes.md).
+// ShowMine's automated checks, which are not counted as views (as on the item page).
+const E2E_USER_AGENT = 'ShowMine-E2E';
 type iWebsitePageProps = {
   website?: iWebsite;
   page?: iWebsitePage;
@@ -100,7 +102,7 @@ const loadArticles = async (website: iWebsite, page: iWebsitePage) => {
 };
 
 // Errors are logged by message only: an axios error carries its request headers, including the server key.
-export const getServerSideProps = async ({ params, query, res }: any) => {
+export const getServerSideProps = async ({ params, query, req, res }: any) => {
   const preview =
     typeof query?.preview === 'string' ? query.preview : undefined;
   if (preview !== undefined) {
@@ -124,11 +126,24 @@ export const getServerSideProps = async ({ params, query, res }: any) => {
       res.statusCode = 404;
       return { props: {} };
     }
+    // A page view is counted beside the articles load; a failure is only logged, never shown.
+    const isCounted =
+      preview === undefined &&
+      !website.isPreview &&
+      req?.headers?.['user-agent'] !== E2E_USER_AGENT;
+    const [articles] = await Promise.all([
+      loadArticles(website, page),
+      isCounted
+        ? WebsiteService.countPageView(`${params.slug}`, page.slug).catch(
+            (err: Error) => console.error(err.message)
+          )
+        : undefined
+    ]);
     return {
       props: {
         website,
         page,
-        articles: await loadArticles(website, page),
+        articles,
         ...(preview ? { preview } : {})
       }
     };
