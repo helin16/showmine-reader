@@ -219,8 +219,8 @@ describe('WebsiteService.getHref()', () => {
   });
 
   test('a template preview links inside /t/<id>', () => {
-    expect(
-      WebsiteService.getHref({ slug: 'shop', basePath: '/t/shop' }, '/about')
-    ).toBe('/t/shop/about');
+    const template = { slug: 'shop', basePath: '/t/shop' };
+    expect(WebsiteService.getHref(template, '/about')).toBe('/t/shop/about');
+    expect(WebsiteService.getHref(template, '/About')).toBeUndefined();
   });
 });

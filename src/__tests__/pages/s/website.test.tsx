@@ -149,6 +149,13 @@ describe('website page', () => {
   });
 
   describe('page', () => {
+    test('a published page has no preview label and can be indexed', async () => {
+      const { props } = await run('shop');
+      render(<WebsitePage {...props} />);
+      expect(screen.queryByText('Preview 预览')).toBeNull();
+      expect(document.head.querySelector('meta[name="robots"]')).toBeNull();
+    });
+
     test('takes meta from the page first', async () => {
       const { props } = await run('shop', ['news']);
       render(<WebsitePage {...props} />);

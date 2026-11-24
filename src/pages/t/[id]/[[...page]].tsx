@@ -7,6 +7,7 @@ import { iWebsite } from '@/types/iWebsite';
 export const getServerSideProps = async ({ params, res }: any) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
+  res.setHeader('Referrer-Policy', 'no-referrer');
   try {
     const id = `${params.id}`;
     const { template, company, pages } =

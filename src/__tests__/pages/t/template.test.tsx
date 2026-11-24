@@ -78,6 +78,10 @@ describe('template preview page', () => {
     expect(WebsiteService.getPublicTemplate).toHaveBeenCalledWith('shop');
     expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
     expect(res.setHeader).toHaveBeenCalledWith('X-Robots-Tag', 'noindex');
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Referrer-Policy',
+      'no-referrer'
+    );
     expect(screen.getByText('Fresh food')).toBeTruthy();
     expect(screen.getByText('Preview 预览')).toBeTruthy();
     // React 19 moves <meta> into the document head.
@@ -115,6 +119,17 @@ describe('template preview page', () => {
 
     expect(res.statusCode).toBe(404);
     expect(screen.getByText('not-found:default')).toBeTruthy();
+  });
+
+  test('404 for a template with no pages', async () => {
+    vi.mocked(WebsiteService.getPublicTemplate).mockResolvedValue({
+      ...template(),
+      pages: []
+    } as any);
+
+    const { res } = await run('shop');
+
+    expect(res.statusCode).toBe(404);
   });
 
   test.each([
