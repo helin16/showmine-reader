@@ -126,8 +126,10 @@ export const getServerSideProps = async ({ params, query, req, res }: any) => {
       res.statusCode = 404;
       return { props: {} };
     }
-    // A page view is counted beside the articles load; a failure is only logged, never shown.
+    // A page view is counted beside the articles load; a failure is only logged, never shown. A HEAD request
+    // (uptime checks) shows nobody the page.
     const isCounted =
+      req?.method !== 'HEAD' &&
       preview === undefined &&
       !website.isPreview &&
       req?.headers?.['user-agent'] !== E2E_USER_AGENT;
@@ -135,7 +137,7 @@ export const getServerSideProps = async ({ params, query, req, res }: any) => {
       loadArticles(website, page),
       isCounted
         ? WebsiteService.countPageView(`${params.slug}`, page.slug).catch(
-            (err: Error) => console.error(err.message)
+            (err: Error) => console.error(err?.message)
           )
         : undefined
     ]);

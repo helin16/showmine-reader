@@ -57,13 +57,14 @@ const run = async (
   slug: string,
   page?: string[],
   query: object = {},
-  userAgent = 'Mozilla/5.0'
+  userAgent = 'Mozilla/5.0',
+  method = 'GET'
 ) => {
   const res = { statusCode: 200, setHeader: vi.fn() };
   const result: any = await getServerSideProps({
     params: { slug, page },
     query,
-    req: { headers: { 'user-agent': userAgent } },
+    req: { method, headers: { 'user-agent': userAgent } },
     res
   });
   return { res, props: result.props };
@@ -188,6 +189,7 @@ describe('website page', () => {
         "ShowMine's automated checks",
         () => run('shop', undefined, {}, 'ShowMine-E2E')
       ],
+      ['a HEAD request', () => run('shop', undefined, {}, undefined, 'HEAD')],
       ['an unknown page', () => run('shop', ['missing'])],
       [
         'a website that fails to load',
