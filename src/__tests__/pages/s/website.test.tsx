@@ -1,0 +1,198 @@
+import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import WebsitePage, { getServerSideProps } from '@/pages/s/[slug]/[[...page]]';
+import WebsiteService from '@/serivices/WebsiteService';
+import ItemService from '@/serivices/ItemService';
+import { iWebsite } from '@/types/iWebsite';
+
+vi.mock('@/serivices/WebsiteService', async importOriginal => {
+  const actual: any = await importOriginal();
+  return { default: { ...actual.default, getPublicWebsite: vi.fn() } };
+});
+vi.mock('@/serivices/ItemService', () => ({
+  default: {
+    getAllItemsUnderCompany: vi.fn(),
+    getCoverImageUrl: () => 'cover.png'
+  }
+}));
+vi.mock('@/components/Header', () => ({
+  default: ({ title, description, image }: any) => (
+    <div>
+      meta:{title}|{description}|{image}
+    </div>
+  )
+}));
+vi.mock('@/components/Page404', () => ({
+  default: ({ title }: any) => <div>not-found:{title || 'default'}</div>
+}));
+vi.mock('next/head', () => ({
+  default: ({ children }: any) => <div data-testid={'head'}>{children}</div>
+}));
+
+const website = (extra: Partial<iWebsite> = {}): iWebsite => ({
+  version: 1,
+  slug: 'shop',
+  companyId: 'company-1',
+  company: { name: 'Shop', logoUrl: 'logo.png' },
+  seo: { title: 'Shop site', description: 'Site words', imageUrl: 'site.png' },
+  pages: [
+    { slug: 'home', title: 'Home', sections: [] },
+    {
+      slug: 'news',
+      title: 'News',
+      seo: { title: 'Latest', description: 'Page words', imageUrl: 'page.png' },
+      sections: [{ id: 's1', type: 'articles', count: 4, tagName: 'events' }]
+    }
+  ],
+  ...extra
+});
+
+const run = async (slug: string, page?: string[], query: object = {}) => {
+  const res = { statusCode: 200, setHeader: vi.fn() };
+  const result: any = await getServerSideProps({
+    params: { slug, page },
+    query,
+    res
+  });
+  return { res, props: result.props };
+};
+
+describe('website page', () => {
+  beforeEach(() => {
+    vi.mocked(WebsiteService.getPublicWebsite).mockResolvedValue(website());
+    vi.mocked(ItemService.getAllItemsUnderCompany).mockResolvedValue({
+      data: [{ id: 'i1', title: 'Event' }]
+    } as any);
+  });
+
+  describe('getServerSideProps()', () => {
+    test('shows the first page at /s/<slug>', async () => {
+      const { props, res } = await run('shop');
+      expect(WebsiteService.getPublicWebsite).toHaveBeenCalledWith(
+        'shop',
+        undefined
+      );
+      expect(props.page.slug).toBe('home');
+      expect(res.setHeader).not.toHaveBeenCalled();
+      expect(ItemService.getAllItemsUnderCompany).not.toHaveBeenCalled();
+    });
+
+    test('shows a named page, with its articles loaded on the server', async () => {
+      const { props } = await run('shop', ['news']);
+      expect(props.page.slug).toBe('news');
+      expect(props.articles).toStrictEqual({
+        s1: [{ id: 'i1', title: 'Event' }]
+      });
+      expect(ItemService.getAllItemsUnderCompany).toHaveBeenCalledWith(
+        'company-1',
+        expect.objectContaining({
+          perPage: 4,
+          sort: 'publishedAt:DESC',
+          tagNames: 'events'
+        })
+      );
+    });
+
+    test('leaves an articles section empty when its articles fail to load', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.mocked(ItemService.getAllItemsUnderCompany).mockRejectedValue(
+        new Error('down')
+      );
+      const { props } = await run('shop', ['news']);
+      expect(props.articles).toStrictEqual({ s1: [] });
+    });
+
+    test('gives not-found for an unknown page', async () => {
+      const { props, res } = await run('shop', ['missing']);
+      expect(props).toStrictEqual({});
+      expect(res.statusCode).toBe(404);
+    });
+
+    test.each([
+      ['404', { response: { status: 404 } }],
+      ['500', { response: { status: 500 } }],
+      ['a network failure', {}]
+    ])('gives not-found when the API answers %s', async (_, extra) => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.mocked(WebsiteService.getPublicWebsite).mockRejectedValue(
+        Object.assign(new Error('x'), extra)
+      );
+      const { props, res } = await run('shop');
+      expect(props).toStrictEqual({});
+      expect(res.statusCode).toBe(404);
+    });
+
+    test('says too many requests on 429', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.mocked(WebsiteService.getPublicWebsite).mockRejectedValue(
+        Object.assign(new Error('x'), { response: { status: 429 } })
+      );
+      const { props, res } = await run('shop');
+      expect(props).toStrictEqual({ isRateLimited: true });
+      expect(res.statusCode).toBe(429);
+    });
+
+    test('a preview is not cached, indexed or sent on as a referrer', async () => {
+      const { props, res } = await run('shop', undefined, { preview: 'abc' });
+      expect(WebsiteService.getPublicWebsite).toHaveBeenCalledWith(
+        'shop',
+        'abc'
+      );
+      expect(props.preview).toBe('abc');
+      expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
+      expect(res.setHeader).toHaveBeenCalledWith('X-Robots-Tag', 'noindex');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Referrer-Policy',
+        'no-referrer'
+      );
+    });
+  });
+
+  describe('page', () => {
+    test('takes meta from the page first', async () => {
+      const { props } = await run('shop', ['news']);
+      render(<WebsitePage {...props} />);
+      expect(
+        screen.getByText('meta:Latest | Shop|Page words|page.png')
+      ).toBeInTheDocument();
+    });
+
+    test('falls back to the site, then the company', async () => {
+      const { props } = await run('shop');
+      render(<WebsitePage {...props} />);
+      expect(
+        screen.getByText('meta:Shop site | Shop|Site words|site.png')
+      ).toBeInTheDocument();
+
+      vi.mocked(WebsiteService.getPublicWebsite).mockResolvedValue(
+        website({ seo: {} })
+      );
+      const bare = await run('shop');
+      render(<WebsitePage {...bare.props} />);
+      expect(
+        screen.getByText('meta:Home | Shop||logo.png')
+      ).toBeInTheDocument();
+    });
+
+    test('a preview carries noindex and keeps the token in its links', async () => {
+      const { props } = await run('shop', undefined, { preview: 'abc' });
+      render(<WebsitePage {...props} />);
+      // React hoists <meta> into the document head.
+      expect(document.querySelector('meta[name="robots"]')).toHaveAttribute(
+        'content',
+        'noindex'
+      );
+      expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
+        'href',
+        '/s/shop/news?preview=abc'
+      );
+    });
+
+    test('shows not-found, or too many requests', () => {
+      const { rerender } = render(<WebsitePage />);
+      expect(screen.getByText('not-found:default')).toBeInTheDocument();
+      rerender(<WebsitePage isRateLimited />);
+      expect(screen.getByText(/Too Many Requests/)).toBeInTheDocument();
+    });
+  });
+});
