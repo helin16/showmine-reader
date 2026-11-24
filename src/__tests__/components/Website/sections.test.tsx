@@ -129,6 +129,10 @@ describe('website sections', () => {
       'src',
       'https://maps.test/x'
     );
+    expect(screen.getByTitle('Map')).toHaveAttribute(
+      'sandbox',
+      'allow-scripts allow-same-origin allow-popups'
+    );
   });
 
   test('contact shows no map for a link that is not https', () => {
@@ -172,6 +176,10 @@ describe('website sections', () => {
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
       'aria-current',
       'page'
+    );
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
+      'href',
+      '/s/shop'
     );
     expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute(
       'href',

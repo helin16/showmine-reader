@@ -41,7 +41,7 @@ const WebsitePage = ({
   // The page's own, then the site's, then the company's (FR-021).
   const title =
     page.seo?.title ||
-    (page === website.pages[0] ? website.seo?.title : '') ||
+    (page.slug === website.pages[0]?.slug ? website.seo?.title : '') ||
     page.title;
   return (
     <>

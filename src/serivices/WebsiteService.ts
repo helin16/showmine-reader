@@ -19,6 +19,17 @@ const getHref = (siteSlug: string, link: unknown, preview?: string) => {
   return /^(https?:\/\/|mailto:|tel:)/i.test(link) ? link : undefined;
 };
 
-const WebsiteService = { getPublicWebsite, getHref };
+// A page of the site; the first is the home page, at /s/<slug> itself.
+const getPageHref = (website: iWebsite, index: number, preview?: string) => {
+  const href = getHref(website.slug, `/${website.pages[index]?.slug}`, preview);
+  return index === 0 && href
+    ? href.replace(
+        `/s/${website.slug}/${website.pages[0].slug}`,
+        `/s/${website.slug}`
+      )
+    : href;
+};
+
+const WebsiteService = { getPublicWebsite, getHref, getPageHref };
 
 export default WebsiteService;

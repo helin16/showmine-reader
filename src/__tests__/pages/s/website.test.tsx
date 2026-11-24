@@ -158,7 +158,8 @@ describe('website page', () => {
     });
 
     test('falls back to the site, then the company', async () => {
-      const { props } = await run('shop');
+      // As the browser gets them: parsed from JSON, so the page is not the same object as pages[0].
+      const props = JSON.parse(JSON.stringify((await run('shop')).props));
       render(<WebsitePage {...props} />);
       expect(
         screen.getByText('meta:Shop site | Shop|Site words|site.png')
@@ -185,6 +186,10 @@ describe('website page', () => {
       expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
         'href',
         '/s/shop/news?preview=abc'
+      );
+      expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
+        'href',
+        '/s/shop?preview=abc'
       );
     });
 

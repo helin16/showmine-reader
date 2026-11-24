@@ -8,11 +8,7 @@ const Nav = ({ website, currentSlug, preview }: iNav) => (
   <nav className={'site-nav'} aria-label={'Pages'}>
     <a
       className={'site-name'}
-      href={WebsiteService.getHref(
-        website.slug,
-        `/${website.pages[0]?.slug}`,
-        preview
-      )}
+      href={WebsiteService.getPageHref(website, 0, preview)}
     >
       {website.company.logoUrl ? (
         <img src={website.company.logoUrl} alt={''} />
@@ -20,14 +16,10 @@ const Nav = ({ website, currentSlug, preview }: iNav) => (
       <span>{website.company.name}</span>
     </a>
     <ul>
-      {website.pages.map(page => (
+      {website.pages.map((page, index) => (
         <li key={page.slug}>
           <a
-            href={WebsiteService.getHref(
-              website.slug,
-              `/${page.slug}`,
-              preview
-            )}
+            href={WebsiteService.getPageHref(website, index, preview)}
             aria-current={page.slug === currentSlug ? 'page' : undefined}
           >
             {page.title}

@@ -86,11 +86,14 @@ export const Contact = ({ section, website }: iSection) => {
         {section.showAddress && address ? <li>{address}</li> : null}
       </ul>
       {/^https:\/\//.test(`${section.mapUrl || ''}`) ? (
+        // Any https page can be set here, so it is sandboxed: it cannot navigate this page or submit forms.
         <iframe
           className={'site-map'}
           src={section.mapUrl}
           title={'Map'}
           loading={'lazy'}
+          sandbox={'allow-scripts allow-same-origin allow-popups'}
+          referrerPolicy={'no-referrer'}
         />
       ) : null}
     </section>
