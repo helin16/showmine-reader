@@ -3,7 +3,7 @@ import '@/styles/article.scss';
 import '@/styles/spinner.scss';
 import '@/styles/itemList.scss';
 import '@/styles/gTranslate.scss';
-import '@/styles/website.scss';
+import '../../public/website.css';
 
 import type { AppProps } from 'next/app';
 export default function App({ Component, pageProps }: AppProps) {

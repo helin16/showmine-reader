@@ -36,6 +36,15 @@ const nextConfig = {
         { key: 'Content-Security-Policy', value: CONTENT_POLICY },
       ],
     },
+    // The admin page editor reads this file for its canvas: any site may read it, and a style change shows there
+    // within minutes.
+    {
+      source: '/website.css',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=300' },
+        { key: 'Access-Control-Allow-Origin', value: '*' },
+      ],
+    },
   ],
 }
 
