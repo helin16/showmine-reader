@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { iWebsite } from '@/types/iWebsite';
 import WebsiteService from '@/serivices/WebsiteService';
 
@@ -12,11 +12,17 @@ const LIST_ICON =
 // Menu button, as on showmine.com.au (SMN-86); /website.css shows the button only there.
 const Nav = ({ website, currentSlug, preview }: iNav) => {
   const [isOpen, setIsOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
+  // Focus goes back to the button, not to the page, when the links fold away.
+  const close = () => {
+    setIsOpen(false);
+    button.current?.focus();
+  };
   return (
     <nav
       className={`site-nav${isOpen ? ' is-open' : ''}`}
       aria-label={'Pages'}
-      onKeyDown={e => e.key === 'Escape' && setIsOpen(false)}
+      onKeyDown={e => isOpen && e.key === 'Escape' && close()}
     >
       <a
         className={'site-name'}
@@ -28,6 +34,7 @@ const Nav = ({ website, currentSlug, preview }: iNav) => {
         <span>{website.company.name}</span>
       </a>
       <button
+        ref={button}
         type={'button'}
         className={'site-menu-button'}
         aria-expanded={isOpen}
@@ -49,7 +56,7 @@ const Nav = ({ website, currentSlug, preview }: iNav) => {
             <a
               href={WebsiteService.getPageHref(website, index, preview)}
               aria-current={page.slug === currentSlug ? 'page' : undefined}
-              onClick={() => setIsOpen(false)}
+              onClick={close}
             >
               {page.title}
             </a>

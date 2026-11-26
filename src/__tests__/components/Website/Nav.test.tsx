@@ -58,11 +58,21 @@ describe('Website menu', () => {
       key: 'Escape'
     });
     expect(nav()).not.toHaveClass('is-open');
+    expect(screen.getByRole('button', { name: 'Menu' })).toHaveFocus();
+  });
+
+  test('Escape does nothing while it is closed', () => {
+    show();
+    const home = screen.getByRole('link', { name: 'Home' });
+    home.focus();
+    fireEvent.keyDown(home, { key: 'Escape' });
+    expect(home).toHaveFocus();
   });
 
   test('a page link closes it', () => {
     fireEvent.click(show());
     fireEvent.click(screen.getByRole('link', { name: 'Home' }));
     expect(nav()).not.toHaveClass('is-open');
+    expect(screen.getByRole('button', { name: 'Menu' })).toHaveFocus();
   });
 });
