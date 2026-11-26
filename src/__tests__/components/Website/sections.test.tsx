@@ -72,6 +72,109 @@ describe('website sections', () => {
     expect(screen.queryByRole('link', { name: 'Go' })).toBeNull();
   });
 
+  // specs/005-website-blocks, slice 88a
+  test('hero with two buttons and a note, the second in its own style', () => {
+    const { container } = show([
+      {
+        id: 'h',
+        type: 'hero',
+        buttonText: 'Start free',
+        buttonUrl: 'https://admin.test/signup',
+        button2Text: 'Login',
+        button2Url: '/about',
+        note: 'No credit card required.'
+      }
+    ]);
+    const buttons = container.querySelector('.site-hero .site-buttons');
+    expect(
+      Array.from(buttons?.querySelectorAll('a') || []).map(a => [
+        a.textContent,
+        a.getAttribute('href'),
+        a.className
+      ])
+    ).toStrictEqual([
+      ['Start free', 'https://admin.test/signup', 'site-button'],
+      ['Login', '/s/shop/about', 'site-button second']
+    ]);
+    expect(buttons?.querySelector('.site-note')?.textContent).toBe(
+      'No credit card required.'
+    );
+  });
+
+  test('a second button without a usable link, or without text, is not shown; nor are empty buttons', () => {
+    const { container } = show([
+      {
+        id: 'a',
+        type: 'hero',
+        heading: 'A',
+        button2Text: 'Go',
+        button2Url: 'javascript:x'
+      },
+      { id: 'b', type: 'hero', heading: 'B', button2Url: '/about' },
+      { id: 'c', type: 'hero', heading: 'C' }
+    ]);
+    expect(container.querySelectorAll('.site-buttons')).toHaveLength(0);
+    expect(screen.queryByRole('link', { name: 'Go' })).toBeNull();
+  });
+
+  test('a hero with only a note shows the note', () => {
+    show([{ id: 'n', type: 'hero', note: 'Free for ever' }]);
+    expect(screen.getByText('Free for ever')).toHaveClass('site-note');
+  });
+
+  test('image beside text: the image, the heading, plain text and buttons, on the side asked for', () => {
+    const { container } = show([
+      {
+        id: 's',
+        type: 'split',
+        heading: 'Manage your content',
+        text: '<b>Line one</b>\nLine two',
+        imageUrl: 'https://cdn.test/s.png',
+        imageAlt: 'A phone',
+        imageSide: 'right',
+        buttonText: 'Start free',
+        buttonUrl: '/about'
+      },
+      {
+        id: 'l',
+        type: 'split',
+        heading: 'Left',
+        imageUrl: 'https://cdn.test/l.png'
+      }
+    ]);
+    const [right, left] = Array.from(container.querySelectorAll('.site-split'));
+    expect(right).toHaveClass('site-split', 'image-right');
+    expect(left).toHaveClass('site-split', 'image-left');
+    expect(left).not.toHaveClass('image-right');
+    expect(right.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://cdn.test/s.png'
+    );
+    expect(screen.getByAltText('A phone')).toBe(right.querySelector('img'));
+    expect(left.querySelector('img')).toHaveAttribute('alt', '');
+    const text = right.querySelector('.site-split-text');
+    expect(text?.querySelector('h2')?.textContent).toBe('Manage your content');
+    // Plain text: the tags show as written, nothing is bold.
+    expect(text?.querySelector('p')?.textContent).toBe(
+      '<b>Line one</b>\nLine two'
+    );
+    expect(right.querySelector('b')).toBeNull();
+    expect(text?.querySelector('.site-buttons a')).toHaveAttribute(
+      'href',
+      '/s/shop/about'
+    );
+  });
+
+  test('image beside text without its image address shows the text alone', () => {
+    const { container } = show([
+      { id: 's', type: 'split', heading: 'No picture' }
+    ]);
+    expect(container.querySelector('.site-split img')).toBeNull();
+    expect(
+      screen.getByRole('heading', { name: 'No picture' })
+    ).toBeInTheDocument();
+  });
+
   test('text shows its HTML', () => {
     show([{ id: 't', type: 'text', html: '<p>Our <b>story</b></p>' }]);
     expect(screen.getByText('story').tagName).toBe('B');

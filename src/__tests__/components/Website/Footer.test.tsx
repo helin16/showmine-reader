@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
-import Site, { getThemeStyle } from '@/components/Website/Site';
+import Site, { getTextColor, getThemeStyle } from '@/components/Website/Site';
 import { FOOTER_ICONS } from '@/components/Website/Footer';
 import { iWebsite, iWebsiteLayout } from '@/types/iWebsite';
 
@@ -147,6 +147,7 @@ describe('Website theme', () => {
       '--site-bg': '#e5eefe',
       '--site-heading': '#58468b',
       '--site-secondary': '#ff9900',
+      '--site-secondary-text': '#212529',
       '--site-width': '1140px'
     });
     const { container } = show(null, theme);
@@ -155,6 +156,23 @@ describe('Website theme', () => {
         '--site-bg'
       )
     ).toBe('#e5eefe');
+  });
+
+  // specs/005-website-blocks: the second button's text reads well on its colour.
+  test.each([
+    ['#facc15', '#212529'],
+    ['#ff9900', '#212529'],
+    ['#ffffff', '#212529'],
+    ['#1a73e8', '#ffffff'],
+    ['#4b3f8f', '#ffffff'],
+    ['#000000', '#ffffff'],
+    ['#777777', '#ffffff']
+  ])('text on %s is %s', (colour, text) => {
+    expect(getTextColor(colour)).toBe(text);
+    expect(getThemeStyle({ secondaryColor: colour })).toStrictEqual({
+      '--site-secondary': colour,
+      '--site-secondary-text': text
+    });
   });
 
   test('leaves out anything else', () => {

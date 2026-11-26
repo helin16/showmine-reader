@@ -10,27 +10,62 @@ type iSection = {
   articles?: iItem[];
 };
 
-export const Hero = ({ section, website, preview }: iSection) => {
-  const href = WebsiteService.getHref(website, section.buttonUrl, preview);
+// A band's buttons (specs/005-website-blocks, slice 88a): the first in the main colour, a second in the second colour,
+// and a small note under them. A button shows only with both its text and its link.
+export const Buttons = ({ section, website, preview }: iSection) => {
+  const first = WebsiteService.getHref(website, section.buttonUrl, preview);
+  const second = WebsiteService.getHref(website, section.button2Url, preview);
+  const hasFirst = !!(first && section.buttonText);
+  const hasSecond = !!(second && section.button2Text);
+  if (!hasFirst && !hasSecond && !section.note) return null;
   return (
-    <section
-      className={`site-hero${section.imageUrl ? ' with-image' : ''}`}
-      style={
-        section.imageUrl
-          ? { backgroundImage: `url("${encodeURI(section.imageUrl)}")` }
-          : undefined
-      }
-    >
-      {section.heading ? <h1>{section.heading}</h1> : null}
-      {section.subheading ? <p>{section.subheading}</p> : null}
-      {href && section.buttonText ? (
-        <a className={'site-button'} href={href}>
+    <div className={'site-buttons'}>
+      {hasFirst ? (
+        <a className={'site-button'} href={first}>
           {section.buttonText}
         </a>
       ) : null}
-    </section>
+      {hasSecond ? (
+        <a className={'site-button second'} href={second}>
+          {section.button2Text}
+        </a>
+      ) : null}
+      {section.note ? <p className={'site-note'}>{section.note}</p> : null}
+    </div>
   );
 };
+
+export const Hero = ({ section, website, preview }: iSection) => (
+  <section
+    className={`site-hero${section.imageUrl ? ' with-image' : ''}`}
+    style={
+      section.imageUrl
+        ? { backgroundImage: `url("${encodeURI(section.imageUrl)}")` }
+        : undefined
+    }
+  >
+    {section.heading ? <h1>{section.heading}</h1> : null}
+    {section.subheading ? <p>{section.subheading}</p> : null}
+    <Buttons section={section} website={website} preview={preview} />
+  </section>
+);
+
+// Image beside text (spec 005, slice 88a): the image on the left or right from 768px of page width, above the text
+// when narrower. The text is plain; its line breaks show.
+export const Split = ({ section, website, preview }: iSection) => (
+  <section
+    className={`site-split image-${section.imageSide === 'right' ? 'right' : 'left'}`}
+  >
+    {section.imageUrl ? (
+      <img src={section.imageUrl} alt={section.imageAlt || ''} />
+    ) : null}
+    <div className={'site-split-text'}>
+      {section.heading ? <h2>{section.heading}</h2> : null}
+      {section.text ? <p>{section.text}</p> : null}
+      <Buttons section={section} website={website} preview={preview} />
+    </div>
+  </section>
+);
 
 // The API cleans this HTML when it is saved and again when published; the Reader's CSP also blocks inline script.
 export const Text = ({ section }: iSection) => (
@@ -118,6 +153,7 @@ export const Articles = ({ articles }: iSection) =>
 
 export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   hero: Hero,
+  split: Split,
   text: Text,
   image: Image,
   gallery: Gallery,

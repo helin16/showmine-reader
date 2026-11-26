@@ -168,6 +168,13 @@
   font-size: 2rem;
 }
 
+.site-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 12px;
+}
 .site-button {
   display: inline-block;
   margin-top: 16px;
@@ -177,6 +184,48 @@
   color: #fff !important;
   text-decoration: none;
   text-shadow: none;
+}
+
+/* The second button, in the theme's second colour (grey when none is set). */
+.site-button.second {
+  background: var(--site-secondary, #6c757d);
+  color: var(--site-secondary-text, #fff) !important;
+}
+.site-note {
+  flex-basis: 100%;
+  margin: 8px 0 0;
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+/* Image beside text (specs/005-website-blocks): stacked, image first; side by side from 768px of page width. */
+.site-split {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+}
+.site-split img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.site-split h2 {
+  margin: 0 0 8px;
+}
+.site-split p {
+  margin: 0;
+  white-space: pre-line;
+}
+.site-split .site-buttons {
+  justify-content: flex-start;
+}
+@container (min-width: 768px) {
+  .site-split {
+    grid-template-columns: 1fr 1fr;
+  }
+  .site-split.image-right img {
+    order: 2;
+  }
 }
 
 .site-image figcaption {

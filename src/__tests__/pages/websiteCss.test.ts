@@ -20,6 +20,11 @@ const BLOCK_CLASSES = [
   'site-hero',
   'with-image',
   'site-button',
+  'site-buttons',
+  'second',
+  'site-note',
+  'site-split',
+  'image-right',
   'site-image',
   'site-gallery',
   'site-contact',
@@ -43,6 +48,26 @@ describe('/website.css', () => {
 
   test('has no @media rule, so narrowing the canvas works', () => {
     expect(css).not.toContain('@media');
+  });
+
+  test('puts the image beside the text from 768 px of site width, on the side asked for (spec 005)', () => {
+    const wide = css.slice(css.indexOf('@container (min-width: 768px) {'));
+    expect(wide).toMatch(
+      /^@container[^}]*\.site-split \{\s*grid-template-columns: 1fr 1fr;/
+    );
+    expect(wide).toMatch(/\.site-split\.image-right img \{\s*order: 2;/);
+    // Narrower, the text keeps its line breaks under the image.
+    expect(css).toMatch(/\.site-split p \{[^}]*white-space: pre-line;/);
+  });
+
+  test("draws the second button in the theme's second colour", () => {
+    expect(css).toMatch(
+      /\.site-button\.second \{[^}]*background: var\(--site-secondary, #6c757d\);/
+    );
+    // Dark text on light colours such as yellow (Site.tsx getTextColor).
+    expect(css).toMatch(
+      /\.site-button\.second \{[^}]*color: var\(--site-secondary-text, #fff\) !important;/
+    );
   });
 
   test('folds the menu below 1024 px of site width, as showmine.com.au', () => {
