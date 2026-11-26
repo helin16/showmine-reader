@@ -14,6 +14,8 @@ const BLOCK_CLASSES = [
   'site-font-friendly',
   'site-nav',
   'site-name',
+  'site-menu-button',
+  'is-open',
   'site-page',
   'site-hero',
   'with-image',
@@ -36,6 +38,17 @@ describe('/website.css', () => {
 
   test('has no @media rule, so narrowing the canvas works', () => {
     expect(css).not.toContain('@media');
+  });
+
+  test('folds the menu below 1024 px of site width, as showmine.com.au', () => {
+    expect(css).toMatch(/\.site \{[^}]*container-type: inline-size;/);
+    const fold = css.slice(css.indexOf('@container (max-width: 1023.98px) {'));
+    expect(fold).toMatch(
+      /^@container[^]*\.site-menu-button \{\s*display: flex;/
+    );
+    expect(fold).toMatch(/\.site-nav ul \{\s*display: none;/);
+    expect(fold).toMatch(/\.site-nav\.is-open ul \{\s*display: flex;/);
+    expect(css).toMatch(/^\.site-menu-button \{\s*display: none;/m);
   });
 
   test('is cached for five minutes, and the admin may read it', async () => {

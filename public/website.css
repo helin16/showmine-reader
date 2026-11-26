@@ -4,6 +4,8 @@
    a container, not the window. */
 .site {
   --site-primary: #1a73e8;
+  /* The menu below follows the site's width: the window's, or the admin canvas's. */
+  container-type: inline-size;
   color: #222;
   line-height: 1.6;
 }
@@ -64,6 +66,71 @@
 .site-nav a[aria-current=page] {
   font-weight: 600;
   text-decoration: underline;
+}
+
+/* Below 1024 px the links fold behind a Menu button, as on showmine.com.au (Tailwind lg).
+   Browsers without container queries keep the wrapped links. */
+.site-menu-button {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.site-menu-button svg,
+.site-menu-button span {
+  width: 32px;
+  height: 32px;
+  font-size: 28px;
+  line-height: 32px;
+  text-align: center;
+}
+@container (max-width: 1023.98px) {
+  .site-nav {
+    position: relative;
+    flex-wrap: nowrap;
+    background: #fff;
+  }
+  .site-menu-button {
+    display: flex;
+  }
+  .site-nav ul {
+    display: none;
+  }
+  .site-nav.is-open ul {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 8px 16px 16px;
+    background: #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+  .site-nav.is-open ul a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    color: inherit;
+    text-decoration: none;
+  }
+  .site-nav.is-open ul a[aria-current=page] {
+    color: var(--site-primary);
+  }
+  .site-nav.is-open ul a[aria-current=page]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--site-primary);
+  }
 }
 
 .site-page {
