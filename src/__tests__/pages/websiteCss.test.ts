@@ -71,6 +71,8 @@ describe('/website.css', () => {
     );
     expect(css).toMatch(/\.site-hero\.with-image h1 \{\s*color: inherit;/);
     expect(css).toMatch(/\.site-footer p \{[^}]*white-space: pre-line;/);
+    // The copyright line beats the footer's paragraph rule.
+    expect(css).toMatch(/\.site-footer \.site-copyright \{\s*margin: 0;/);
   });
 
   test('is cached for five minutes, and the admin may read it', async () => {

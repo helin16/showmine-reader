@@ -154,6 +154,21 @@ describe('Website menu with a layout', () => {
     expect(name).not.toHaveTextContent('Shop');
   });
 
+  test('with no logo shown, the name is shown anyway', () => {
+    render(
+      <Nav
+        website={withHeader(
+          { showLogo: false, showName: false },
+          'https://cdn.test/logo.png'
+        )}
+        currentSlug={'home'}
+      />
+    );
+    const name = screen.getByRole('link', { name: 'Shop' });
+    expect(name).toHaveTextContent('Shop');
+    expect(name).not.toHaveAttribute('aria-label');
+  });
+
   test('without a layout shows the logo, the name and every page', () => {
     const { container } = render(
       <Nav

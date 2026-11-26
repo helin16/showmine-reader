@@ -15,6 +15,9 @@ const Nav = ({ website, currentSlug, preview }: iNav) => {
   // The layout's header (slice 4a): logo and name switches, hidden pages, then outside links.
   const header = website.layout?.header || {};
   const hidden = header.hiddenSlugs || [];
+  // With no logo shown, the name always is, so the home link is never empty.
+  const showsLogo = header.showLogo !== false && !!website.company.logoUrl;
+  const showsName = header.showName !== false || !showsLogo;
   const button = useRef<HTMLButtonElement>(null);
   // Focus goes back to the button, not to the page, when the links fold away.
   const close = () => {
@@ -30,14 +33,10 @@ const Nav = ({ website, currentSlug, preview }: iNav) => {
       <a
         className={'site-name'}
         href={WebsiteService.getPageHref(website, 0, preview)}
-        aria-label={
-          header.showName === false ? website.company.name : undefined
-        }
+        aria-label={showsName ? undefined : website.company.name}
       >
-        {header.showLogo !== false && website.company.logoUrl ? (
-          <img src={website.company.logoUrl} alt={''} />
-        ) : null}
-        {header.showName !== false ? <span>{website.company.name}</span> : null}
+        {showsLogo ? <img src={website.company.logoUrl} alt={''} /> : null}
+        {showsName ? <span>{website.company.name}</span> : null}
       </a>
       <button
         ref={button}
