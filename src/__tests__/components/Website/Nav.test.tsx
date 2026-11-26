@@ -76,3 +76,99 @@ describe('Website menu', () => {
     expect(screen.getByRole('button', { name: 'Menu' })).toHaveFocus();
   });
 });
+
+// The layout's header (showmine-admin specs/004, slice 4a).
+describe('Website menu with a layout', () => {
+  const withHeader = (header: object, logoUrl?: string) =>
+    ({
+      ...website,
+      company: { name: 'Shop', logoUrl },
+      layout: { header }
+    }) as iWebsite;
+
+  test('leaves hidden pages out and adds outside links after the pages', () => {
+    render(
+      <Nav
+        website={withHeader({
+          hiddenSlugs: ['about'],
+          links: [
+            { label: 'Start free', url: 'https://admin.test/signup' },
+            { label: 'Bad', url: 'javascript:alert(1)' },
+            { label: 'Home again', url: '/home' }
+          ]
+        })}
+        currentSlug={'home'}
+      />
+    );
+    const links = screen.getAllByRole('link');
+    expect(links.map(link => link.textContent)).toStrictEqual([
+      'Shop',
+      'Home',
+      'Start free',
+      'Home again'
+    ]);
+    expect(links[2]).toHaveAttribute('href', 'https://admin.test/signup');
+    expect(links[3]).toHaveAttribute('href', '/s/shop/home');
+    expect(screen.queryByText('Bad')).toBeNull();
+  });
+
+  test('an outside link closes the menu', () => {
+    render(
+      <Nav
+        website={withHeader({
+          links: [{ label: 'Login', url: 'https://a.test' }]
+        })}
+        currentSlug={'home'}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Login' }));
+    expect(nav()).not.toHaveClass('is-open');
+  });
+
+  test('hides the logo or the name; the link keeps the name', () => {
+    const { container, unmount } = render(
+      <Nav
+        website={withHeader({ showLogo: false }, 'https://cdn.test/logo.png')}
+        currentSlug={'home'}
+      />
+    );
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveTextContent(
+      'Shop'
+    );
+    unmount();
+
+    const shown = render(
+      <Nav
+        website={withHeader({ showName: false }, 'https://cdn.test/logo.png')}
+        currentSlug={'home'}
+      />
+    );
+    expect(shown.container.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://cdn.test/logo.png'
+    );
+    const name = screen.getByRole('link', { name: 'Shop' });
+    expect(name).toHaveClass('site-name');
+    expect(name).not.toHaveTextContent('Shop');
+  });
+
+  test('without a layout shows the logo, the name and every page', () => {
+    const { container } = render(
+      <Nav
+        website={
+          {
+            ...website,
+            company: { name: 'Shop', logoUrl: 'https://cdn.test/l.png' }
+          } as iWebsite
+        }
+        currentSlug={'home'}
+      />
+    );
+    expect(container.querySelector('img')).not.toBeNull();
+    expect(
+      screen.getAllByRole('link').map(link => link.textContent)
+    ).toStrictEqual(['Shop', 'Home', 'About']);
+  });
+});

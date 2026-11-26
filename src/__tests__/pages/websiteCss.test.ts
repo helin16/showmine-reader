@@ -24,7 +24,12 @@ const BLOCK_CLASSES = [
   'site-gallery',
   'site-contact',
   'site-map',
-  'site-articles'
+  'site-articles',
+  'site-footer',
+  'site-footer-columns',
+  'site-footer-contact',
+  'site-footer-image',
+  'site-copyright'
 ];
 
 describe('/website.css', () => {
@@ -49,6 +54,23 @@ describe('/website.css', () => {
     expect(fold).toMatch(/\.site-nav ul \{\s*display: none;/);
     expect(fold).toMatch(/\.site-nav\.is-open ul \{\s*display: flex;/);
     expect(css).toMatch(/^\.site-menu-button \{\s*display: none;/m);
+  });
+
+  test('reads the theme variables, falling back to the look before them', () => {
+    expect(css).toMatch(
+      /\.site \{[^}]*background: var\(--site-bg, transparent\);/
+    );
+    expect(css).toMatch(
+      /\.site h1,\s*\.site h2,\s*\.site h3 \{\s*color: var\(--site-heading, inherit\);/
+    );
+    expect(css).toMatch(
+      /\.site-page \{\s*max-width: var\(--site-width, 960px\);/
+    );
+    expect(css).toMatch(
+      /\.site-footer-columns \{[^}]*max-width: var\(--site-width, 960px\);/
+    );
+    expect(css).toMatch(/\.site-hero\.with-image h1 \{\s*color: inherit;/);
+    expect(css).toMatch(/\.site-footer p \{[^}]*white-space: pre-line;/);
   });
 
   test('is cached for five minutes, and the admin may read it', async () => {

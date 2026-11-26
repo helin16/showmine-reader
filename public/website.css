@@ -7,6 +7,8 @@
   /* The menu below follows the site's width: the window's, or the admin canvas's. */
   container-type: inline-size;
   color: #222;
+  /* Theme colours and width (layout, slice 4a); without them the site looks as before. */
+  background: var(--site-bg, transparent);
   line-height: 1.6;
 }
 .site.site-font-modern {
@@ -24,6 +26,11 @@
 }
 .site a {
   color: var(--site-primary);
+}
+.site h1,
+.site h2,
+.site h3 {
+  color: var(--site-heading, inherit);
 }
 
 .site-preview-note {
@@ -134,7 +141,7 @@
 }
 
 .site-page {
-  max-width: 960px;
+  max-width: var(--site-width, 960px);
   margin: 0 auto;
   padding: 0 16px 32px;
 }
@@ -152,6 +159,9 @@
 .site-hero.with-image {
   color: #fff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+.site-hero.with-image h1 {
+  color: inherit;
 }
 .site-hero h1 {
   margin: 0 0 8px;
@@ -212,4 +222,56 @@
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
+}
+
+/* The layout's footer: columns side by side, stacking when the site is narrow (a grid, no query needed). */
+.site-footer {
+  margin-top: 32px;
+  border-top: 1px solid #eee;
+}
+.site-footer-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  max-width: var(--site-width, 960px);
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+.site-footer h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+.site-footer p {
+  margin: 0 0 8px;
+  white-space: pre-line;
+}
+.site-footer-contact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.site-footer-contact svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.site-footer .site-button {
+  margin-top: 0;
+}
+.site-footer-image img {
+  max-width: 160px;
+}
+.site-copyright {
+  margin: 0;
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
 }

@@ -12,6 +12,9 @@ const LIST_ICON =
 // Menu button, as on showmine.com.au (SMN-86); /website.css shows the button only there.
 const Nav = ({ website, currentSlug, preview }: iNav) => {
   const [isOpen, setIsOpen] = useState(false);
+  // The layout's header (slice 4a): logo and name switches, hidden pages, then outside links.
+  const header = website.layout?.header || {};
+  const hidden = header.hiddenSlugs || [];
   const button = useRef<HTMLButtonElement>(null);
   // Focus goes back to the button, not to the page, when the links fold away.
   const close = () => {
@@ -27,11 +30,14 @@ const Nav = ({ website, currentSlug, preview }: iNav) => {
       <a
         className={'site-name'}
         href={WebsiteService.getPageHref(website, 0, preview)}
+        aria-label={
+          header.showName === false ? website.company.name : undefined
+        }
       >
-        {website.company.logoUrl ? (
+        {header.showLogo !== false && website.company.logoUrl ? (
           <img src={website.company.logoUrl} alt={''} />
         ) : null}
-        <span>{website.company.name}</span>
+        {header.showName !== false ? <span>{website.company.name}</span> : null}
       </a>
       <button
         ref={button}
@@ -51,17 +57,29 @@ const Nav = ({ website, currentSlug, preview }: iNav) => {
         )}
       </button>
       <ul id={'site-menu'}>
-        {website.pages.map((page, index) => (
-          <li key={page.slug}>
-            <a
-              href={WebsiteService.getPageHref(website, index, preview)}
-              aria-current={page.slug === currentSlug ? 'page' : undefined}
-              onClick={close}
-            >
-              {page.title}
-            </a>
-          </li>
-        ))}
+        {website.pages.map((page, index) =>
+          hidden.includes(page.slug) ? null : (
+            <li key={page.slug}>
+              <a
+                href={WebsiteService.getPageHref(website, index, preview)}
+                aria-current={page.slug === currentSlug ? 'page' : undefined}
+                onClick={close}
+              >
+                {page.title}
+              </a>
+            </li>
+          )
+        )}
+        {(header.links || []).map((link, index) => {
+          const href = WebsiteService.getHref(website, link.url, preview);
+          return href ? (
+            <li key={`link-${index}`}>
+              <a href={href} onClick={close}>
+                {link.label}
+              </a>
+            </li>
+          ) : null;
+        })}
       </ul>
     </nav>
   );

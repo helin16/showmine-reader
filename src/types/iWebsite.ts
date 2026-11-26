@@ -19,6 +19,33 @@ export type iWebsitePage = {
   sections: iWebsiteSection[];
 };
 
+// The site layout (showmine-admin specs/004-website-visual-editor, slice 4a). Plain text only.
+export type iWebsiteFooterItem =
+  | { type: 'text'; text: string }
+  | { type: 'contact'; icon: string; text: string }
+  | { type: 'button'; label: string; url: string }
+  // url: the image's address; link: where it leads.
+  | {
+      type: 'image';
+      assetId: string;
+      alt?: string;
+      link?: string;
+      url?: string;
+    };
+
+export type iWebsiteLayout = {
+  header?: {
+    showLogo?: boolean;
+    showName?: boolean;
+    hiddenSlugs?: string[];
+    links?: { label: string; url: string }[];
+  };
+  footer?: {
+    columns?: { heading?: string; items?: iWebsiteFooterItem[] }[];
+    copyright?: string;
+  } | null;
+};
+
 export type iWebsite = {
   version: number;
   slug: string;
@@ -26,7 +53,16 @@ export type iWebsite = {
   isPreview?: boolean;
   // Where its pages live: /s/<slug> by default, /t/<id> for a template preview.
   basePath?: string;
-  theme?: { primaryColor?: string; fontPair?: string };
+  theme?: {
+    primaryColor?: string;
+    fontPair?: string;
+    backgroundColor?: string;
+    headingColor?: string;
+    secondaryColor?: string;
+    contentWidth?: number;
+  };
+  // Absent or null: the site shows as before the layout.
+  layout?: iWebsiteLayout | null;
   seo?: iWebsiteSeo;
   company: {
     name: string;
