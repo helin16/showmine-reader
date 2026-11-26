@@ -172,3 +172,36 @@ describe('Website theme', () => {
     expect(getThemeStyle(undefined)).toBeUndefined();
   });
 });
+
+// Shared blocks above and below every page's own (showmine-admin specs/004, slice 4b).
+describe('Website shared blocks', () => {
+  const hero = (id: string, heading: string) => ({ id, type: 'hero', heading });
+  const headings = () =>
+    within(screen.getByRole('main'))
+      .getAllByRole('heading')
+      .map(heading => heading.textContent);
+
+  test('draws the shared blocks above and below the page, inside main', () => {
+    const website = site({
+      sharedAbove: [hero('a', 'Above')],
+      sharedBelow: [hero('b', 'Signup Today'), hero('c', 'Last')]
+    });
+    website.pages[1].sections = [hero('p', 'Page')];
+    render(<Site website={website} page={website.pages[1]} articles={{}} />);
+    expect(headings()).toStrictEqual(['Above', 'Page', 'Signup Today', 'Last']);
+  });
+
+  test('a layout without shared blocks, or no layout, shows only the page', () => {
+    const website = site({ footer: null });
+    website.pages[0].sections = [hero('p', 'Page')];
+    const { unmount } = render(
+      <Site website={website} page={website.pages[0]} articles={{}} />
+    );
+    expect(headings()).toStrictEqual(['Page']);
+    unmount();
+    const plain = site(null);
+    plain.pages[0].sections = [hero('p', 'Page')];
+    render(<Site website={plain} page={plain.pages[0]} articles={{}} />);
+    expect(headings()).toStrictEqual(['Page']);
+  });
+});

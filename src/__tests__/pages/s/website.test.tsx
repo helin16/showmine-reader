@@ -108,6 +108,19 @@ describe('website page', () => {
       );
     });
 
+    test('loads the articles of shared blocks too', async () => {
+      vi.mocked(WebsiteService.getPublicWebsite).mockResolvedValue(
+        website({
+          layout: {
+            sharedBelow: [{ id: 'shared', type: 'articles', count: 3 }]
+          }
+        }) as any
+      );
+      const { props } = await run('shop', ['news']);
+      expect(Object.keys(props.articles)).toStrictEqual(['s1', 'shared']);
+      expect(ItemService.getAllItemsUnderCompany).toHaveBeenCalledTimes(2);
+    });
+
     test('leaves an articles section empty when its articles fail to load', async () => {
       vi.spyOn(console, 'error').mockImplementation(() => undefined);
       vi.mocked(ItemService.getAllItemsUnderCompany).mockRejectedValue(

@@ -2,7 +2,7 @@ import Head from 'next/head';
 import moment from 'moment';
 import Header from '@/components/Header';
 import Page404 from '@/components/Page404';
-import Site from '@/components/Website/Site';
+import Site, { getSections } from '@/components/Website/Site';
 import WebsiteService from '@/serivices/WebsiteService';
 import ItemService from '@/serivices/ItemService';
 import { OP_LT } from '@/helper/ServiceHelper';
@@ -75,7 +75,9 @@ const WebsitePage = ({
 
 // An articles section that fails to load is left empty; it never takes the page down.
 const loadArticles = async (website: iWebsite, page: iWebsitePage) => {
-  const sections = page.sections.filter(section => section.type === 'articles');
+  const sections = getSections(website, page).filter(
+    section => section.type === 'articles'
+  );
   const lists = await Promise.all(
     sections.map(section =>
       ItemService.getAllItemsUnderCompany(website.companyId, {

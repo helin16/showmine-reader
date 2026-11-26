@@ -37,6 +37,13 @@ export const getThemeStyle = (theme: iWebsite['theme'] = {}) => {
   return Object.keys(style).length > 0 ? (style as any) : undefined;
 };
 
+// The page's own blocks with the layout's shared blocks above and below (slice 4b).
+export const getSections = (website: iWebsite, page: iWebsitePage) => [
+  ...(website.layout?.sharedAbove || []),
+  ...page.sections,
+  ...(website.layout?.sharedBelow || [])
+];
+
 const Site = ({ website, page, preview, articles }: iSite) => {
   const { fontPair } = website.theme || {};
   return (
@@ -49,7 +56,7 @@ const Site = ({ website, page, preview, articles }: iSite) => {
       ) : null}
       <Nav website={website} currentSlug={page.slug} preview={preview} />
       <main className={'site-page'}>
-        {page.sections.map(section => {
+        {getSections(website, page).map(section => {
           const Section = SECTIONS[section.type];
           return Section ? (
             <Section

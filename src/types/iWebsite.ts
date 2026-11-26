@@ -44,6 +44,9 @@ export type iWebsiteLayout = {
     columns?: { heading?: string; items?: iWebsiteFooterItem[] }[];
     copyright?: string;
   } | null;
+  // Shared blocks above and below every page's own (slice 4b): page sections.
+  sharedAbove?: iWebsiteSection[];
+  sharedBelow?: iWebsiteSection[];
 };
 
 export type iWebsite = {
