@@ -60,6 +60,12 @@ describe('/website.css', () => {
     expect(css).toMatch(/\.site-split p \{[^}]*white-space: pre-line;/);
   });
 
+  test('a note on a hero picture is white like the rest of the hero', () => {
+    expect(css).toMatch(
+      /\.site-hero\.with-image \.site-note \{\s*color: inherit;/
+    );
+  });
+
   test("draws the second button in the theme's second colour", () => {
     expect(css).toMatch(
       /\.site-button\.second \{[^}]*background: var\(--site-secondary, #6c757d\);/

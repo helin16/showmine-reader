@@ -197,6 +197,10 @@
   color: #6c757d;
   font-size: 0.85rem;
 }
+/* On a hero picture the note takes the hero's white text, as its other text. */
+.site-hero.with-image .site-note {
+  color: inherit;
+}
 
 /* Image beside text (specs/005-website-blocks): stacked, image first; side by side from 768px of page width. */
 .site-split {

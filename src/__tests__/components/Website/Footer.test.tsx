@@ -166,7 +166,10 @@ describe('Website theme', () => {
     ['#1a73e8', '#ffffff'],
     ['#4b3f8f', '#ffffff'],
     ['#000000', '#ffffff'],
-    ['#777777', '#ffffff']
+    ['#777777', '#ffffff'],
+    // Near the threshold: white reads better on mid grey.
+    ['#808080', '#ffffff'],
+    ['#8a8a8a', '#212529']
   ])('text on %s is %s', (colour, text) => {
     expect(getTextColor(colour)).toBe(text);
     expect(getThemeStyle({ secondaryColor: colour })).toStrictEqual({

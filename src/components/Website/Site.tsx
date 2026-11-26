@@ -31,8 +31,8 @@ export const getTextColor = (hex: string) => {
     return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
   const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  // Contrast with white is 1.05 / (L + 0.05); with DARK_TEXT (L 0.0157) it is (L + 0.05) / 0.0657.
-  return 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.0657
+  // Contrast with white is 1.05 / (L + 0.05); with DARK_TEXT (L 0.0181) it is (L + 0.05) / 0.0681.
+  return 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.0681
     ? '#ffffff'
     : DARK_TEXT;
 };
