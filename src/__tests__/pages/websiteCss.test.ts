@@ -92,8 +92,10 @@ describe('/website.css', () => {
       /\.site-cards\.columns-4 ul \{\s*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/
     );
     expect(css).toMatch(
-      /\.site-cards\.boxed \.site-card \{[^}]*background: #fff;/
+      /\.site-cards\.boxed \.site-card \{[^}]*align-items: center;[^}]*background: #fff;/
     );
+    // Titles line up along a row of cards without boxes.
+    expect(css).toMatch(/\.site-card \{[^}]*align-items: flex-start;/);
   });
 
   test("draws the second button in the theme's second colour", () => {
