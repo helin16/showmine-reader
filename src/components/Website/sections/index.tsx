@@ -67,6 +67,50 @@ export const Split = ({ section, website, preview }: iSection) => (
   </section>
 );
 
+// Card grid (spec 005, slice 88b): 2, 3 or 4 columns on a wide site, 2 on a tablet, 1 on a phone. A card with a
+// usable link is a link as a whole.
+export const Cards = ({ section, website, preview }: iSection) => {
+  const columns = ['2', '3', '4'].includes(`${section.columns}`)
+    ? section.columns
+    : '3';
+  const items: any[] = Array.isArray(section.items) ? section.items : [];
+  return (
+    <section
+      className={`site-cards columns-${columns}${section.boxed === true ? ' boxed' : ''}`}
+    >
+      {section.heading ? <h2>{section.heading}</h2> : null}
+      {section.intro ? (
+        <p className={'site-cards-intro'}>{section.intro}</p>
+      ) : null}
+      <ul>
+        {items.map((item, index) => {
+          const href = WebsiteService.getHref(website, item?.link, preview);
+          const card = (
+            <>
+              {item?.imageUrl ? <img src={item.imageUrl} alt={''} /> : null}
+              <div>
+                {item?.title ? <h3>{item.title}</h3> : null}
+                {item?.text ? <p>{item.text}</p> : null}
+              </div>
+            </>
+          );
+          return (
+            <li key={index}>
+              {href ? (
+                <a className={'site-card'} href={href}>
+                  {card}
+                </a>
+              ) : (
+                <div className={'site-card'}>{card}</div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+};
+
 // The API cleans this HTML when it is saved and again when published; the Reader's CSP also blocks inline script.
 export const Text = ({ section }: iSection) => (
   <section
@@ -154,6 +198,7 @@ export const Articles = ({ articles }: iSection) =>
 export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   hero: Hero,
   split: Split,
+  cards: Cards,
   text: Text,
   image: Image,
   gallery: Gallery,

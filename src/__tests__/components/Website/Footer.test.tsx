@@ -178,6 +178,18 @@ describe('Website theme', () => {
     });
   });
 
+  test('the button colour sets the first button and its text (spec 005, slice 88b)', () => {
+    expect(getThemeStyle({ buttonColor: '#facc15' })).toStrictEqual({
+      '--site-button': '#facc15',
+      '--site-button-text': '#212529'
+    });
+    expect(getThemeStyle({ buttonColor: '#1a73e8' })).toStrictEqual({
+      '--site-button': '#1a73e8',
+      '--site-button-text': '#ffffff'
+    });
+    expect(getThemeStyle({ buttonColor: 'yellow' })).toBeUndefined();
+  });
+
   test('leaves out anything else', () => {
     expect(
       getThemeStyle({

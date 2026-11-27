@@ -19,7 +19,9 @@ const COLOR_VARS = {
   primaryColor: '--site-primary',
   backgroundColor: '--site-bg',
   headingColor: '--site-heading',
-  secondaryColor: '--site-secondary'
+  secondaryColor: '--site-secondary',
+  // The first button's colour (spec 005, slice 88b); absent, /website.css uses the main colour.
+  buttonColor: '--site-button'
 } as const;
 const CONTENT_WIDTHS = [960, 1140, 1280];
 const DARK_TEXT = '#212529';
@@ -46,6 +48,9 @@ export const getThemeStyle = (theme: iWebsite['theme'] = {}) => {
     }
   });
   // The second button's text (specs/005-website-blocks).
+  if (style['--site-button']) {
+    style['--site-button-text'] = getTextColor(style['--site-button']);
+  }
   if (style['--site-secondary']) {
     style['--site-secondary-text'] = getTextColor(style['--site-secondary']);
   }

@@ -24,6 +24,12 @@ const BLOCK_CLASSES = [
   'second',
   'site-note',
   'site-split',
+  'site-cards',
+  'site-cards-intro',
+  'site-card',
+  'boxed',
+  'columns-3',
+  'columns-4',
   'image-right',
   'site-image',
   'site-gallery',
@@ -63,6 +69,30 @@ describe('/website.css', () => {
   test('a note on a hero picture is white like the rest of the hero', () => {
     expect(css).toMatch(
       /\.site-hero\.with-image \.site-note \{\s*color: inherit;/
+    );
+  });
+
+  test("draws the first button in the theme's button colour, or the main colour", () => {
+    expect(css).toMatch(
+      /\.site-button \{[^}]*background: var\(--site-button, var\(--site-primary\)\);[^}]*color: var\(--site-button-text, #fff\) !important;/
+    );
+  });
+
+  test('lays cards out in 1 column, 2 from 560 px and 3 or 4 from 900 px of site width (spec 005)', () => {
+    expect(css).toMatch(/\.site-cards ul \{[^}]*grid-template-columns: 1fr;/);
+    const tablet = css.slice(css.indexOf('@container (min-width: 560px) {'));
+    expect(tablet).toMatch(
+      /^@container[^}]*\.site-cards ul \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/
+    );
+    const wide = css.slice(css.indexOf('@container (min-width: 900px) {'));
+    expect(wide).toMatch(
+      /^@container[^}]*\.site-cards\.columns-3 ul \{\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/
+    );
+    expect(wide).toMatch(
+      /\.site-cards\.columns-4 ul \{\s*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/
+    );
+    expect(css).toMatch(
+      /\.site-cards\.boxed \.site-card \{[^}]*background: #fff;/
     );
   });
 

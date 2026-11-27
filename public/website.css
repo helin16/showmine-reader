@@ -180,8 +180,9 @@
   margin-top: 16px;
   padding: 10px 20px;
   border-radius: 6px;
-  background: var(--site-primary);
-  color: #fff !important;
+  /* The theme's button colour, with dark or white text; the main colour when none is set. */
+  background: var(--site-button, var(--site-primary));
+  color: var(--site-button-text, #fff) !important;
   text-decoration: none;
   text-shadow: none;
 }
@@ -229,6 +230,72 @@
   }
   .site-split.image-right img {
     order: 2;
+  }
+}
+
+/* Card grid (specs/005-website-blocks): one column, two from 560px of site width, the block's own from 900px. */
+.site-cards > h2,
+.site-cards-intro {
+  text-align: center;
+}
+.site-cards > h2 {
+  margin: 0 0 8px;
+}
+.site-cards-intro {
+  max-width: 640px;
+  margin: 0 auto 16px;
+}
+.site-cards ul {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-card {
+  display: flex;
+  /* Titles line up along a row; in a box the icon sits level with the text's middle. */
+  align-items: flex-start;
+  gap: 16px;
+  height: 100%;
+  box-sizing: border-box;
+  color: inherit;
+  text-decoration: none;
+}
+.site-card img {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+.site-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.site-card p {
+  margin: 4px 0 0;
+  color: #6c757d;
+  white-space: pre-line;
+}
+.site-cards.boxed .site-card {
+  padding: 20px;
+  border-radius: 8px;
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+@container (min-width: 560px) {
+  .site-cards ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 900px) {
+  .site-cards.columns-3 ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .site-cards.columns-4 ul {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

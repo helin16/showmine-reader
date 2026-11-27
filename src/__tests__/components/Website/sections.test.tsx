@@ -175,6 +175,79 @@ describe('website sections', () => {
     ).toBeInTheDocument();
   });
 
+  // specs/005-website-blocks, slice 88b
+  test('card grid: heading, intro, and cards with image, title and text; a linked card is a link', () => {
+    const { container } = show([
+      {
+        id: 'c',
+        type: 'cards',
+        heading: 'Perfect Integration',
+        intro: 'Sync to many places',
+        columns: '4',
+        boxed: true,
+        items: [
+          {
+            imageUrl: 'https://cdn.test/w.png',
+            title: 'WeChat',
+            text: '<i>Official</i>',
+            link: '/about'
+          },
+          { title: 'Facebook', link: 'javascript:x' },
+          { text: 'Only text' },
+          'not a card'
+        ]
+      }
+    ]);
+    const cards = container.querySelector('.site-cards') as HTMLElement;
+    expect(cards).toHaveClass('site-cards', 'columns-4', 'boxed');
+    expect(cards.querySelector('h2')?.textContent).toBe('Perfect Integration');
+    expect(cards.querySelector('.site-cards-intro')?.textContent).toBe(
+      'Sync to many places'
+    );
+    const items = Array.from(cards.querySelectorAll('ul > li'));
+    expect(items).toHaveLength(4);
+    const first = items[0].querySelector('a.site-card') as HTMLElement;
+    expect(first).toHaveAttribute('href', '/s/shop/about');
+    expect(first.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://cdn.test/w.png'
+    );
+    expect(first.querySelector('img')).toHaveAttribute('alt', '');
+    expect(first.querySelector('h3')?.textContent).toBe('WeChat');
+    // Plain text.
+    expect(first.querySelector('p')?.textContent).toBe('<i>Official</i>');
+    expect(first.querySelector('i')).toBeNull();
+    // A link the site would not follow leaves a plain card.
+    expect(items[1].querySelector('a')).toBeNull();
+    expect(items[1].querySelector('div.site-card h3')?.textContent).toBe(
+      'Facebook'
+    );
+    expect(items[1].querySelector('img')).toBeNull();
+    expect(items[2].querySelector('h3')).toBeNull();
+    expect(items[2].querySelector('p')?.textContent).toBe('Only text');
+  });
+
+  test('card grid: 3 columns and no boxes unless asked; no cards, no trouble', () => {
+    const { container } = show([
+      { id: 'a', type: 'cards', items: [{ title: 'A' }] },
+      {
+        id: 'b',
+        type: 'cards',
+        columns: '9',
+        boxed: 'yes',
+        items: [{ title: 'B' }]
+      },
+      { id: 'c', type: 'cards', columns: '2' }
+    ]);
+    const [a, b, c] = Array.from(container.querySelectorAll('.site-cards'));
+    expect(a.className).toBe('site-cards columns-3');
+    expect(b.className).toBe('site-cards columns-3');
+    expect(c.className).toBe('site-cards columns-2');
+    expect(c.querySelectorAll('li')).toHaveLength(0);
+    expect(a.querySelector('h2')).toBeNull();
+    expect(a.querySelector('.site-cards-intro')).toBeNull();
+  });
+
   test('text shows its HTML', () => {
     show([{ id: 't', type: 'text', html: '<p>Our <b>story</b></p>' }]);
     expect(screen.getByText('story').tagName).toBe('B');

@@ -62,6 +62,7 @@ export type iWebsite = {
     backgroundColor?: string;
     headingColor?: string;
     secondaryColor?: string;
+    buttonColor?: string;
     contentWidth?: number;
   };
   // Absent or null: the site shows as before the layout.
