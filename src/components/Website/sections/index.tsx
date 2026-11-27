@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import iItem from '@/types/iItem';
 import { iWebsite, iWebsiteSection } from '@/types/iWebsite';
 import WebsiteService from '@/serivices/WebsiteService';
@@ -168,22 +169,79 @@ export const Pricing = ({ section, website, preview }: iSection) => {
 
 const MAP_HEIGHTS = ['small', 'medium', 'large'];
 
-// A map on its own (spec 005, slice 88c): the content's full width, sandboxed as the Contact block's map.
-export const MapBlock = ({ section }: iSection) =>
-  /^https:\/\//.test(`${section.mapUrl || ''}`) ? (
+// Mainland China's time zones, with their old names (specs/007-website-hubspot-map). Hong Kong and Macau load
+// Google Maps.
+const CHINA_TIME_ZONES = [
+  'Asia/Shanghai',
+  'Asia/Urumqi',
+  'Asia/Chongqing',
+  'Asia/Chungking',
+  'Asia/Harbin',
+  'Asia/Kashgar',
+  'PRC'
+];
+
+// In WeChat, or in a browser set to a mainland China time zone, the China map (Amap) is the one that loads. No IP
+// lookup: these two cover most visitors in China, and the switch link covers the rest.
+export const prefersChinaMap = () => {
+  if (/MicroMessenger/i.test(navigator.userAgent)) return true;
+  try {
+    return CHINA_TIME_ZONES.includes(
+      Intl.DateTimeFormat().resolvedOptions().timeZone
+    );
+  } catch {
+    return false;
+  }
+};
+
+const isHttps = (value: unknown) => /^https:\/\//.test(`${value || ''}`);
+
+// A map on its own (spec 005, slice 88c): the content's full width, sandboxed as the Contact block's map. With a China
+// map link too (spec 007), the visitor's browser picks one after loading; until then an empty box of the map's height,
+// so no visitor loads both maps.
+export const MapBlock = ({ section }: iSection) => {
+  const china =
+    isHttps(section.mapUrl) && isHttps(section.chinaMapUrl)
+      ? section.chinaMapUrl
+      : null;
+  const [showChina, setShowChina] = useState<boolean | null>(
+    china ? null : false
+  );
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the visitor's browser is only known after hydration
+    if (china) setShowChina(prefersChinaMap());
+  }, [china]);
+
+  if (!isHttps(section.mapUrl)) return null;
+  return (
     <section
       className={`site-map-block ${MAP_HEIGHTS.includes(`${section.height}`) ? section.height : 'medium'}`}
     >
-      <iframe
-        className={'site-map'}
-        src={section.mapUrl}
-        title={'Map'}
-        loading={'lazy'}
-        sandbox={'allow-scripts allow-same-origin allow-popups'}
-        referrerPolicy={'no-referrer'}
-      />
+      {showChina === null ? (
+        <div className={'site-map'} aria-hidden={'true'} />
+      ) : (
+        <iframe
+          className={'site-map'}
+          src={showChina ? china : section.mapUrl}
+          title={'Map'}
+          loading={'lazy'}
+          sandbox={'allow-scripts allow-same-origin allow-popups'}
+          referrerPolicy={'no-referrer'}
+        />
+      )}
+      {china && showChina !== null ? (
+        <button
+          type={'button'}
+          className={'site-map-switch'}
+          onClick={() => setShowChina(!showChina)}
+        >
+          {'Switch map 切换地图'}
+        </button>
+      ) : null}
     </section>
-  ) : null;
+  );
+};
 
 // The API cleans this HTML when it is saved and again when published; the Reader's CSP also blocks inline script.
 export const Text = ({ section }: iSection) => (

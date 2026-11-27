@@ -1,6 +1,8 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, test } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import Site from '@/components/Website/Site';
+import { prefersChinaMap } from '@/components/Website/sections';
 import WebsiteService from '@/serivices/WebsiteService';
 import { iWebsite, iWebsiteSection } from '@/types/iWebsite';
 
@@ -281,6 +283,120 @@ describe('website sections', () => {
     expect(frame).toHaveAttribute('referrerpolicy', 'no-referrer');
     expect(frame).toHaveAttribute('title', 'Map');
     expect(frame).toHaveClass('site-map');
+  });
+
+  // specs/007-website-hubspot-map
+  describe('a map with a China link', () => {
+    const GOOGLE = 'https://www.google.com/maps/embed?pb=x';
+    const AMAP = 'https://uri.amap.com/marker?position=145.13,-37.89';
+    const both: iWebsiteSection = {
+      id: 'm',
+      type: 'map',
+      mapUrl: GOOGLE,
+      chinaMapUrl: AMAP
+    };
+    const browser = (userAgent: string, timeZone: string) => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(userAgent);
+      vi.spyOn(
+        Intl.DateTimeFormat.prototype,
+        'resolvedOptions'
+      ).mockReturnValue({
+        timeZone
+      } as Intl.ResolvedDateTimeFormatOptions);
+    };
+    const frames = (container: HTMLElement) =>
+      Array.from(container.querySelectorAll('iframe')).map(f =>
+        f.getAttribute('src')
+      );
+    const DESKTOP = 'Mozilla/5.0 (Macintosh) Chrome/140';
+    const WECHAT = 'Mozilla/5.0 (iPhone) MicroMessenger/8.0.50';
+    afterEach(() => vi.restoreAllMocks());
+
+    test.each([
+      ['WeChat abroad', WECHAT, 'Australia/Melbourne', true],
+      ['a browser in Shanghai time', DESKTOP, 'Asia/Shanghai', true],
+      ['a browser in Urumqi time', DESKTOP, 'Asia/Urumqi', true],
+      ['an old name for China time', DESKTOP, 'PRC', true],
+      ['a browser in Melbourne', DESKTOP, 'Australia/Melbourne', false],
+      ['a browser in Hong Kong', DESKTOP, 'Asia/Hong_Kong', false],
+      ['a browser in Taipei', DESKTOP, 'Asia/Taipei', false]
+    ])('%s: China map %s', (_name, userAgent, timeZone, china) => {
+      browser(userAgent, timeZone);
+      expect(prefersChinaMap()).toBe(china);
+      const { container } = show([both]);
+      expect(frames(container)).toStrictEqual([china ? AMAP : GOOGLE]);
+    });
+
+    test('no time zone known: the main map', () => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(DESKTOP);
+      vi.spyOn(
+        Intl.DateTimeFormat.prototype,
+        'resolvedOptions'
+      ).mockImplementation(() => {
+        throw new Error('no Intl');
+      });
+      expect(prefersChinaMap()).toBe(false);
+    });
+
+    test('the switch shows the other map, and back', () => {
+      browser(DESKTOP, 'Australia/Melbourne');
+      const { container } = show([both]);
+      const button = screen.getByRole('button', {
+        name: 'Switch map 切换地图'
+      });
+      fireEvent.click(button);
+      expect(frames(container)).toStrictEqual([AMAP]);
+      fireEvent.click(button);
+      expect(frames(container)).toStrictEqual([GOOGLE]);
+      const frame = container.querySelector('iframe') as HTMLIFrameElement;
+      expect(frame).toHaveAttribute(
+        'sandbox',
+        'allow-scripts allow-same-origin allow-popups'
+      );
+      expect(frame).toHaveAttribute('referrerpolicy', 'no-referrer');
+    });
+
+    test('the page from the server loads neither map: an empty box of the height until the browser picks', () => {
+      const website = site([{ ...both, height: 'small' }]);
+      const html = renderToString(
+        <Site website={website} page={website.pages[0]} articles={{}} />
+      );
+      expect(html).not.toContain('<iframe');
+      expect(html).toContain('class="site-map-block small"');
+      expect(html).toContain('class="site-map" aria-hidden="true"');
+      expect(html).not.toContain('Switch map');
+    });
+
+    test('with only the main link the map is as before, with no switch, also from the server', () => {
+      const only: iWebsiteSection = { id: 'm', type: 'map', mapUrl: GOOGLE };
+      const website = site([only]);
+      expect(
+        renderToString(
+          <Site website={website} page={website.pages[0]} articles={{}} />
+        )
+      ).toContain(`<iframe class="site-map" src="${GOOGLE}"`);
+      const { container } = show([only]);
+      expect(frames(container)).toStrictEqual([GOOGLE]);
+      expect(
+        screen.queryByRole('button', { name: 'Switch map 切换地图' })
+      ).toBeNull();
+    });
+
+    test.each([
+      [
+        'an http China link',
+        { chinaMapUrl: 'http://uri.amap.com/x' },
+        [GOOGLE]
+      ],
+      ['a China link with no main link', { mapUrl: undefined }, []]
+    ])('%s is not used', (_name, extra, expected) => {
+      browser(WECHAT, 'Asia/Shanghai');
+      const { container } = show([{ ...both, ...extra }]);
+      expect(frames(container)).toStrictEqual(expected);
+      expect(
+        screen.queryByRole('button', { name: 'Switch map 切换地图' })
+      ).toBeNull();
+    });
   });
 
   // specs/005-website-blocks, slice 88b

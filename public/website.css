@@ -371,6 +371,19 @@
 .site-map-block.large .site-map {
   height: 480px;
 }
+/* The other map (spec 007): a small text link under the map. */
+.site-map-switch {
+  display: block;
+  margin: 8px 0 0 auto;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
 
 /* Message form (specs/006-website-message-form): fields stacked; first and last name side by side from 560px. */
 .site-form > h2 {
