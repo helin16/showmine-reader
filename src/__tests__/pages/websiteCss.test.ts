@@ -108,7 +108,7 @@ describe('/website.css', () => {
 
   test('lays plans side by side as they fit, one on a phone, and draws a highlighted plan in the button colour (spec 005)', () => {
     expect(css).toMatch(
-      /\.site-pricing > ul \{[^}]*grid-template-columns: repeat\(auto-fit, minmax\(220px, 1fr\)\);/
+      /\.site-pricing > ul \{[^}]*grid-template-columns: repeat\(auto-fit, minmax\(220px, 320px\)\);[^}]*justify-content: center;/
     );
     expect(css).toMatch(
       /\.site-plan\.highlight \{\s*border-color: var\(--site-button, var\(--site-primary\)\);/

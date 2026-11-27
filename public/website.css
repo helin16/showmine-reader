@@ -299,14 +299,16 @@
   }
 }
 
-/* Pricing plans (specs/005-website-blocks): as many side by side as fit at 220px or more, one on a phone. */
+/* Pricing plans (specs/005-website-blocks): as many side by side as fit at 220px or more, one on a phone; at most
+   320px wide each, centred, so one plan is not as wide as the page. */
 .site-pricing > h2 {
   margin: 0 0 8px;
   text-align: center;
 }
 .site-pricing > ul {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 320px));
+  justify-content: center;
   gap: 24px;
   margin: 0;
   padding: 0;
