@@ -27,7 +27,7 @@ const sendMessage = (
     lastName: string;
     email: string;
     message: string;
-    website: string;
+    hpNote: string;
   }
 ) =>
   AppService.post(

@@ -54,7 +54,8 @@ const NOT_LIVE =
 
 const MessageForm = ({ section, website, preview, pageSlug }: iMessageForm) => {
   const [values, setValues] = useState<iValues>(EMPTY);
-  // The hidden field people never see; a bot that fills it is answered as sent.
+  // The hidden field people never see; a bot that fills it is answered as sent. Not named like anything a browser
+  // fills in by itself.
   const [trap, setTrap] = useState('');
   const [errors, setErrors] = useState<{ [field: string]: string }>({});
   const [notice, setNotice] = useState('');
@@ -76,7 +77,7 @@ const MessageForm = ({ section, website, preview, pageSlug }: iMessageForm) => {
       await WebsiteService.sendMessage(website.slug, {
         ...values,
         pageSlug,
-        website: trap
+        hpNote: trap
       });
       setIsSent(true);
     } catch (err: any) {
@@ -158,10 +159,10 @@ const MessageForm = ({ section, website, preview, pageSlug }: iMessageForm) => {
             </div>
           ))}
           <div className={'site-form-trap'} aria-hidden={'true'}>
-            <label htmlFor={id('website')}>Website</label>
+            <label htmlFor={id('hpNote')}>Leave this empty</label>
             <input
-              id={id('website')}
-              name={'website'}
+              id={id('hpNote')}
+              name={'hpNote'}
               type={'text'}
               tabIndex={-1}
               autoComplete={'off'}

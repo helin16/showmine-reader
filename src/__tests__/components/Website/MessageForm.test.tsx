@@ -106,7 +106,7 @@ describe('message form', () => {
       email: 'ann@example.com',
       message: 'Hello',
       pageSlug: 'contact-us',
-      website: ''
+      hpNote: ''
     });
     expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
   });
@@ -241,7 +241,7 @@ describe('message form', () => {
       .mockResolvedValue({} as never);
     const { container } = show();
     const trap = container.querySelector(
-      'input[name="website"]'
+      'input[name="hpNote"]'
     ) as HTMLInputElement;
     expect(trap).toHaveAttribute('tabindex', '-1');
     expect(trap.closest('.site-form-trap')).toHaveAttribute(
@@ -253,7 +253,7 @@ describe('message form', () => {
     send();
     await screen.findByRole('status');
     expect(sendMessage.mock.calls[0][1]).toMatchObject({
-      website: 'https://spam.example'
+      hpNote: 'https://spam.example'
     });
   });
 });
