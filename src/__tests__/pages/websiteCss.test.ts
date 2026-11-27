@@ -24,6 +24,11 @@ const BLOCK_CLASSES = [
   'second',
   'site-note',
   'site-split',
+  'site-form',
+  'site-form-field',
+  'site-form-error',
+  'site-form-thanks',
+  'site-form-trap',
   'site-pricing',
   'site-plan',
   'highlight',
@@ -130,6 +135,21 @@ describe('/website.css', () => {
     );
     expect(css).toMatch(
       /\.site-map-block\.large \.site-map \{\s*height: 480px;/
+    );
+  });
+
+  test('keeps the hidden form field out of sight, and puts the names side by side from 560 px (spec 006)', () => {
+    expect(css).toMatch(
+      /\.site-form-trap \{[^}]*position: absolute;[^}]*left: -10000px;/
+    );
+    const wide = css.slice(
+      css.indexOf('@container (min-width: 560px) {\n  .site-form form')
+    );
+    expect(wide).toMatch(
+      /^@container[^}]*\.site-form form \{\s*grid-template-columns: 1fr 1fr;/
+    );
+    expect(css).toMatch(
+      /\.site-form-field input,\n\.site-form-field textarea \{[^}]*width: 100%;/
     );
   });
 

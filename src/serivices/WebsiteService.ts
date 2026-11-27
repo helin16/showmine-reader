@@ -17,6 +17,24 @@ const countPageView = (slug: string, pageSlug: string) =>
     { timeout: PAGE_VIEW_TIMEOUT_MS }
   );
 
+// A visitor's message from a page's message form (showmine-admin specs/006). From the browser, so the API's
+// per-address limit counts the visitor.
+const sendMessage = (
+  slug: string,
+  message: {
+    pageSlug?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    message: string;
+    website: string;
+  }
+) =>
+  AppService.post(
+    `/publicWebsite/${encodeURIComponent(slug)}/message`,
+    message
+  );
+
 // A template with sample content (GET /publicTemplate/:id).
 const getPublicTemplate = (
   id: string
@@ -62,6 +80,7 @@ const getPageHref = (website: iWebsite, index: number, preview?: string) => {
 const WebsiteService = {
   getPublicWebsite,
   countPageView,
+  sendMessage,
   getPublicTemplate,
   getHref,
   getPageHref

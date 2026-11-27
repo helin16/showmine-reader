@@ -372,6 +372,73 @@
   height: 480px;
 }
 
+/* Message form (specs/006-website-message-form): fields stacked; first and last name side by side from 560px. */
+.site-form > h2 {
+  margin: 0 0 8px;
+  text-align: center;
+}
+.site-form form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.site-form-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.site-form-field input,
+.site-form-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+}
+.site-form-error {
+  display: block;
+  margin: 4px 0 0;
+  color: #c62828;
+}
+.site-form-thanks {
+  text-align: center;
+  font-size: 1.1rem;
+}
+.site-form button.site-button {
+  justify-self: start;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.site-form button.site-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+/* Out of sight and out of the tab order, but still in the form for a bot to fill. */
+.site-form-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+@container (min-width: 560px) {
+  .site-form form {
+    grid-template-columns: 1fr 1fr;
+  }
+  .site-form-field.email,
+  .site-form-field.message,
+  .site-form-trap,
+  .site-form .site-form-error,
+  .site-form button.site-button {
+    grid-column: 1 / -1;
+  }
+}
+
 .site-image figcaption {
   color: #888;
   font-size: 0.9rem;

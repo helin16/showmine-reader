@@ -86,6 +86,7 @@ const Site = ({ website, page, preview, articles }: iSite) => {
               website={website}
               preview={preview}
               articles={articles[section.id]}
+              pageSlug={page.slug}
             />
           ) : null;
         })}

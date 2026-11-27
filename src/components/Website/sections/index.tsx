@@ -2,12 +2,15 @@ import iItem from '@/types/iItem';
 import { iWebsite, iWebsiteSection } from '@/types/iWebsite';
 import WebsiteService from '@/serivices/WebsiteService';
 import ItemService from '@/serivices/ItemService';
+import MessageForm from '@/components/Website/MessageForm';
 
 type iSection = {
   section: iWebsiteSection;
   website: iWebsite;
   preview?: string;
   articles?: iItem[];
+  // The page shown, which a message form names (specs/006).
+  pageSlug?: string;
 };
 
 // A band's buttons (specs/005-website-blocks, slice 88a): the first in the main colour, a second in the second colour,
@@ -272,6 +275,7 @@ export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   cards: Cards,
   pricing: Pricing,
   map: MapBlock,
+  form: MessageForm,
   text: Text,
   image: Image,
   gallery: Gallery,
