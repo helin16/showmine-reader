@@ -26,17 +26,15 @@ const COLOR_VARS = {
 const CONTENT_WIDTHS = [960, 1140, 1280];
 const DARK_TEXT = '#212529';
 
-// The text colour that reads best on a colour (WCAG contrast): dark on light colours such as yellow, else white.
+// The text colour for a button of a colour: white when white has a WCAG contrast of 3 or more on it (large or bold
+// text), as on most blues and greens; dark on light colours such as yellow.
 export const getTextColor = (hex: string) => {
   const [r, g, b] = [1, 3, 5].map(i => {
     const c = parseInt(hex.slice(i, i + 2), 16) / 255;
     return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
   const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  // Contrast with white is 1.05 / (L + 0.05); with DARK_TEXT (L 0.0181) it is (L + 0.05) / 0.0681.
-  return 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.0681
-    ? '#ffffff'
-    : DARK_TEXT;
+  return 1.05 / (luminance + 0.05) >= 3 ? '#ffffff' : DARK_TEXT;
 };
 
 // Only values the API allows reach the page's style.

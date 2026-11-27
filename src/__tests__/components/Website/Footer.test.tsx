@@ -167,9 +167,10 @@ describe('Website theme', () => {
     ['#4b3f8f', '#ffffff'],
     ['#000000', '#ffffff'],
     ['#777777', '#ffffff'],
-    // Near the threshold: white reads better on mid grey.
-    ['#808080', '#ffffff'],
-    ['#8a8a8a', '#212529']
+    // White while its contrast is 3 or more; near the threshold:
+    ['#3d82f4', '#ffffff'],
+    ['#909090', '#ffffff'],
+    ['#a0a0a0', '#212529']
   ])('text on %s is %s', (colour, text) => {
     expect(getTextColor(colour)).toBe(text);
     expect(getThemeStyle({ secondaryColor: colour })).toStrictEqual({
