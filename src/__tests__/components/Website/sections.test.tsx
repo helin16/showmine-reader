@@ -175,6 +175,114 @@ describe('website sections', () => {
     ).toBeInTheDocument();
   });
 
+  // specs/005-website-blocks, slice 88c
+  test('pricing plans: name, price and period, features, a button, and a highlighted plan', () => {
+    const { container } = show([
+      {
+        id: 'p',
+        type: 'pricing',
+        heading: 'Prices and plans',
+        intro: 'Unbeatable',
+        plans: [
+          {
+            name: 'Free',
+            price: '$0',
+            period: 'monthly',
+            features: ['1 user', '', '  ', '<b>2G</b> storage'],
+            buttonText: 'Start Free',
+            buttonUrl: '/about'
+          },
+          {
+            name: 'Starter',
+            price: '$49',
+            highlight: true,
+            buttonText: 'Go',
+            buttonUrl: 'javascript:x'
+          },
+          {
+            name: 'Odd',
+            price: 'POA',
+            features: 'not a list',
+            highlight: 'yes'
+          },
+          null
+        ]
+      }
+    ]);
+    const block = container.querySelector('.site-pricing') as HTMLElement;
+    expect(block.querySelector('h2')?.textContent).toBe('Prices and plans');
+    expect(block.querySelector('.site-cards-intro')?.textContent).toBe(
+      'Unbeatable'
+    );
+    const plans = Array.from(block.querySelectorAll(':scope > ul > li'));
+    expect(plans.map(p => p.className)).toStrictEqual([
+      'site-plan',
+      'site-plan highlight',
+      'site-plan',
+      'site-plan'
+    ]);
+    expect(plans[0].querySelector('h3')?.textContent).toBe('Free');
+    expect(plans[0].querySelector('.site-price')?.textContent).toBe(
+      '$0 monthly'
+    );
+    expect(plans[0].querySelector('.site-price strong')?.textContent).toBe(
+      '$0'
+    );
+    // Empty lines are left out; text stays plain.
+    expect(
+      Array.from(plans[0].querySelectorAll('ul li')).map(li => li.textContent)
+    ).toStrictEqual(['1 user', '<b>2G</b> storage']);
+    expect(plans[0].querySelector('b')).toBeNull();
+    expect(plans[0].querySelector('a.site-button')).toHaveAttribute(
+      'href',
+      '/s/shop/about'
+    );
+    // A link the site would not follow shows no button.
+    expect(plans[1].querySelector('a')).toBeNull();
+    expect(plans[1].querySelector('.site-price')?.textContent).toBe('$49');
+    expect(plans[2].querySelector('ul')).toBeNull();
+    expect(plans[3].querySelector('h3')).toBeNull();
+  });
+
+  test('pricing without plans shows its heading and no plans', () => {
+    const { container } = show([
+      { id: 'p', type: 'pricing', heading: 'Soon' },
+      { id: 'q', type: 'pricing', plans: 'broken' }
+    ]);
+    const [a, b] = Array.from(container.querySelectorAll('.site-pricing'));
+    expect(a.querySelector('h2')?.textContent).toBe('Soon');
+    expect(a.querySelectorAll('li')).toHaveLength(0);
+    expect(b.querySelectorAll('li')).toHaveLength(0);
+  });
+
+  test('a map block at its height, sandboxed; none without an https address', () => {
+    const { container } = show([
+      {
+        id: 'm1',
+        type: 'map',
+        mapUrl: 'https://maps.test/embed',
+        height: 'large'
+      },
+      { id: 'm2', type: 'map', mapUrl: 'https://maps.test/b', height: 'huge' },
+      { id: 'm3', type: 'map', mapUrl: 'http://maps.test/c' },
+      { id: 'm4', type: 'map' }
+    ]);
+    const blocks = Array.from(container.querySelectorAll('.site-map-block'));
+    expect(blocks.map(b => b.className)).toStrictEqual([
+      'site-map-block large',
+      'site-map-block medium'
+    ]);
+    const frame = blocks[0].querySelector('iframe') as HTMLIFrameElement;
+    expect(frame).toHaveAttribute('src', 'https://maps.test/embed');
+    expect(frame).toHaveAttribute(
+      'sandbox',
+      'allow-scripts allow-same-origin allow-popups'
+    );
+    expect(frame).toHaveAttribute('referrerpolicy', 'no-referrer');
+    expect(frame).toHaveAttribute('title', 'Map');
+    expect(frame).toHaveClass('site-map');
+  });
+
   // specs/005-website-blocks, slice 88b
   test('card grid: heading, intro, and cards with image, title and text; a linked card is a link', () => {
     const { container } = show([

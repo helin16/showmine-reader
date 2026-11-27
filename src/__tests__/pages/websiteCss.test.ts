@@ -24,6 +24,14 @@ const BLOCK_CLASSES = [
   'second',
   'site-note',
   'site-split',
+  'site-pricing',
+  'site-plan',
+  'highlight',
+  'site-price',
+  'site-map-block',
+  'small',
+  'medium',
+  'large',
   'site-cards',
   'site-cards-intro',
   'site-card',
@@ -96,6 +104,33 @@ describe('/website.css', () => {
     );
     // Titles line up along a row of cards without boxes.
     expect(css).toMatch(/\.site-card \{[^}]*align-items: flex-start;/);
+  });
+
+  test('lays plans side by side as they fit, one on a phone, and draws a highlighted plan in the button colour (spec 005)', () => {
+    expect(css).toMatch(
+      /\.site-pricing > ul \{[^}]*grid-template-columns: repeat\(auto-fit, minmax\(220px, 1fr\)\);/
+    );
+    expect(css).toMatch(
+      /\.site-plan\.highlight \{\s*border-color: var\(--site-button, var\(--site-primary\)\);/
+    );
+    // Buttons line up at the bottom of plans of different lengths.
+    expect(css).toMatch(
+      /\.site-plan \{[^}]*display: flex;[^}]*flex-direction: column;/
+    );
+    expect(css).toMatch(/\.site-plan \.site-button \{\s*margin-top: auto;/);
+    expect(css).not.toMatch(/\.site-plan ul \+ \.site-button/);
+  });
+
+  test('draws a map block at its height: 240, 360 or 480 px', () => {
+    expect(css).toMatch(
+      /\.site-map-block\.small \.site-map \{\s*height: 240px;/
+    );
+    expect(css).toMatch(
+      /\.site-map-block\.medium \.site-map \{\s*height: 360px;/
+    );
+    expect(css).toMatch(
+      /\.site-map-block\.large \.site-map \{\s*height: 480px;/
+    );
   });
 
   test("draws the second button in the theme's second colour", () => {

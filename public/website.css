@@ -299,6 +299,77 @@
   }
 }
 
+/* Pricing plans (specs/005-website-blocks): as many side by side as fit at 220px or more, one on a phone. */
+.site-pricing > h2 {
+  margin: 0 0 8px;
+  text-align: center;
+}
+.site-pricing > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-plan {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+.site-plan.highlight {
+  border-color: var(--site-button, var(--site-primary));
+}
+.site-plan h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.site-price {
+  margin: 12px 0;
+}
+.site-price strong {
+  font-size: 2rem;
+  color: var(--site-heading, inherit);
+}
+.site-price span {
+  color: #6c757d;
+}
+.site-plan ul {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.site-plan ul li {
+  padding: 6px 0;
+  border-top: 1px solid #eee;
+}
+/* The button sits at the bottom, so buttons line up across plans of different lengths. */
+.site-plan .site-button {
+  margin-top: auto;
+  align-self: center;
+}
+
+/* A map on its own (spec 005): the content's width, three heights. */
+.site-map-block .site-map {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+.site-map-block.small .site-map {
+  height: 240px;
+}
+.site-map-block.medium .site-map {
+  height: 360px;
+}
+.site-map-block.large .site-map {
+  height: 480px;
+}
+
 .site-image figcaption {
   color: #888;
   font-size: 0.9rem;

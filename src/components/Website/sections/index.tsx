@@ -111,6 +111,77 @@ export const Cards = ({ section, website, preview }: iSection) => {
   );
 };
 
+// Pricing plans (spec 005, slice 88c): side by side as the site's width allows, one under another on a phone; a
+// highlighted plan stands out. A plan's button shows with both its text and a usable link.
+export const Pricing = ({ section, website, preview }: iSection) => {
+  const plans: any[] = Array.isArray(section.plans) ? section.plans : [];
+  return (
+    <section className={'site-pricing'}>
+      {section.heading ? <h2>{section.heading}</h2> : null}
+      {section.intro ? (
+        <p className={'site-cards-intro'}>{section.intro}</p>
+      ) : null}
+      <ul>
+        {plans.map((plan, index) => {
+          const href = WebsiteService.getHref(
+            website,
+            plan?.buttonUrl,
+            preview
+          );
+          const features: string[] = Array.isArray(plan?.features)
+            ? plan.features.filter(
+                (line: unknown) => typeof line === 'string' && line.trim()
+              )
+            : [];
+          return (
+            <li
+              key={index}
+              className={`site-plan${plan?.highlight === true ? ' highlight' : ''}`}
+            >
+              {plan?.name ? <h3>{plan.name}</h3> : null}
+              <p className={'site-price'}>
+                <strong>{plan?.price}</strong>
+                {plan?.period ? <span> {plan.period}</span> : null}
+              </p>
+              {features.length > 0 ? (
+                <ul>
+                  {features.map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {href && plan?.buttonText ? (
+                <a className={'site-button'} href={href}>
+                  {plan.buttonText}
+                </a>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+};
+
+const MAP_HEIGHTS = ['small', 'medium', 'large'];
+
+// A map on its own (spec 005, slice 88c): the content's full width, sandboxed as the Contact block's map.
+export const MapBlock = ({ section }: iSection) =>
+  /^https:\/\//.test(`${section.mapUrl || ''}`) ? (
+    <section
+      className={`site-map-block ${MAP_HEIGHTS.includes(`${section.height}`) ? section.height : 'medium'}`}
+    >
+      <iframe
+        className={'site-map'}
+        src={section.mapUrl}
+        title={'Map'}
+        loading={'lazy'}
+        sandbox={'allow-scripts allow-same-origin allow-popups'}
+        referrerPolicy={'no-referrer'}
+      />
+    </section>
+  ) : null;
+
 // The API cleans this HTML when it is saved and again when published; the Reader's CSP also blocks inline script.
 export const Text = ({ section }: iSection) => (
   <section
@@ -199,6 +270,8 @@ export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   hero: Hero,
   split: Split,
   cards: Cards,
+  pricing: Pricing,
+  map: MapBlock,
   text: Text,
   image: Image,
   gallery: Gallery,
