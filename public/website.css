@@ -693,8 +693,6 @@
 .site-style-airy .site-page .site-cards-intro {
   font-size: 18px;
   line-height: 32px;
-  max-width: 50%;
-  min-width: min(100%, 320px);
 }
 .site-style-airy .site-cards.boxed ul {
   display: flex;
@@ -705,7 +703,7 @@
 .site-style-airy .site-cards.boxed li {
   width: 320px;
   max-width: 100%;
-  margin: 40px 0;
+  margin: 20px 0;
 }
 .site-style-airy .site-cards.boxed .site-card {
   gap: 24px;
@@ -799,6 +797,12 @@
   }
   .site-style-airy .site-hero {
     padding: 96px 0;
+  }
+  .site-style-airy .site-page .site-cards-intro {
+    max-width: 50%;
+  }
+  .site-style-airy .site-cards.boxed li {
+    margin: 40px 0;
   }
   /* Text a third, the picture two thirds, as most of showmine.com.au's bands. */
   .site-style-airy .site-split.image-left {
