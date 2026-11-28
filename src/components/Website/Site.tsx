@@ -58,12 +58,23 @@ export const getThemeStyle = (theme: iWebsite['theme'] = {}) => {
   return Object.keys(style).length > 0 ? (style as any) : undefined;
 };
 
+// A shared block leaves out the pages named in its hiddenSlugs (SMN-95).
+const getShared = (list: iWebsiteSection[] = [], page: iWebsitePage) =>
+  list.filter(section => !section.hiddenSlugs?.includes(page.slug));
+
 // The page's own blocks with the layout's shared blocks above and below (slice 4b).
 export const getSections = (website: iWebsite, page: iWebsitePage) => [
-  ...(website.layout?.sharedAbove || []),
+  ...getShared(website.layout?.sharedAbove, page),
   ...page.sections,
-  ...(website.layout?.sharedBelow || [])
+  ...getShared(website.layout?.sharedBelow, page)
 ];
+
+// The blocks and those inside rows, for what loads data by block id (SMN-96).
+export const getAllBlocks = (sections: iWebsiteSection[]): iWebsiteSection[] =>
+  sections.flatMap(section => [
+    section,
+    ...(Array.isArray(section.blocks) ? getAllBlocks(section.blocks) : [])
+  ]);
 
 // The site's classes: its font pair, and the airy style (SMN-93) when chosen; unknown values fall back to the plain look.
 export const getSiteClass = (theme: iWebsite['theme'] = {}) =>
@@ -104,9 +115,9 @@ const Site = ({ website, page, preview, articles }: iSite) => {
       <Nav website={website} currentSlug={page.slug} preview={preview} />
       <main className={'site-page'}>
         {[
-          ...groupSideBySide(website.layout?.sharedAbove || []),
+          ...groupSideBySide(getShared(website.layout?.sharedAbove, page)),
           ...groupSideBySide(page.sections),
-          ...groupSideBySide(website.layout?.sharedBelow || [])
+          ...groupSideBySide(getShared(website.layout?.sharedBelow, page))
         ].map(group => {
           const blocks = group.map(section => {
             const Section = SECTIONS[section.type];
@@ -117,6 +128,7 @@ const Site = ({ website, page, preview, articles }: iSite) => {
                 website={website}
                 preview={preview}
                 articles={articles[section.id]}
+                articlesById={articles}
                 pageSlug={page.slug}
               />
             ) : null;

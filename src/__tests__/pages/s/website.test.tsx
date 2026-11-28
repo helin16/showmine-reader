@@ -121,6 +121,45 @@ describe('website page', () => {
       expect(ItemService.getAllItemsUnderCompany).toHaveBeenCalledTimes(2);
     });
 
+    test('loads articles blocks inside rows, and leaves out shared blocks hidden on the page', async () => {
+      vi.mocked(WebsiteService.getPublicWebsite).mockResolvedValue(
+        website({
+          layout: {
+            sharedBelow: [
+              {
+                id: 'gone',
+                type: 'articles',
+                count: 3,
+                hiddenSlugs: ['news']
+              }
+            ]
+          },
+          pages: [
+            {
+              slug: 'news',
+              title: 'News',
+              sections: [
+                {
+                  id: 'row',
+                  type: 'row',
+                  blocks: [
+                    { id: 'a1', type: 'articles', count: 3 },
+                    {
+                      id: 'inner',
+                      type: 'row',
+                      blocks: [{ id: 'a2', type: 'articles', count: 3 }]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }) as any
+      );
+      const { props } = await run('shop');
+      expect(Object.keys(props.articles)).toStrictEqual(['a1', 'a2']);
+    });
+
     test('leaves an articles section empty when its articles fail to load', async () => {
       vi.spyOn(console, 'error').mockImplementation(() => undefined);
       vi.mocked(ItemService.getAllItemsUnderCompany).mockRejectedValue(

@@ -12,6 +12,8 @@ type iSection = {
   articles?: iItem[];
   // The page shown, which a message form names (specs/006).
   pageSlug?: string;
+  // Every articles section's items by id, for the blocks inside a row.
+  articlesById?: { [sectionId: string]: iItem[] };
 };
 
 // A band's buttons (specs/005-website-blocks, slice 88a): the first in the main colour, a second in the second colour,
@@ -358,6 +360,98 @@ export const Articles = ({ section, articles }: iSection) => {
   );
 };
 
+// Buttons on their own (SMN-96): the band's buttons as a block.
+export const ButtonsBlock = (props: iSection) => (
+  <section className={'site-buttons-block'}>
+    <Buttons {...props} />
+  </section>
+);
+
+// A small card (SMN-96): an icon, a title and a line of text; a link makes the whole card a link.
+export const Tile = ({ section, website, preview }: iSection) => {
+  const href = WebsiteService.getHref(website, section.link, preview);
+  const body = (
+    <>
+      {section.imageUrl ? (
+        <img
+          className={'site-tile-icon'}
+          src={section.imageUrl}
+          alt={section.imageAlt || ''}
+        />
+      ) : null}
+      <div className={'site-tile-body'}>
+        {section.title ? (
+          <h3 className={'site-tile-title'}>{section.title}</h3>
+        ) : null}
+        {section.text ? (
+          <p className={'site-tile-text'}>{section.text}</p>
+        ) : null}
+      </div>
+    </>
+  );
+  return href ? (
+    <a className={'site-tile'} href={href}>
+      {body}
+    </a>
+  ) : (
+    <section className={'site-tile'}>{body}</section>
+  );
+};
+
+// Row (SMN-96): blocks side by side or stacked, drawn through the same SECTIONS map, so a row can hold a row.
+// Values outside the lists fall back to the defaults.
+const pick = (value: unknown, allowed: string[], fallback: string) =>
+  allowed.includes(`${value}`) ? `${value}` : fallback;
+const BASES = ['1/4', '1/3', '2/5', '1/2', '3/5', '2/3', '3/4', 'full'];
+
+export const Row = (props: iSection) => {
+  const { section } = props;
+  const sizes = ['none', 'small', 'medium', 'large'];
+  const blocks: iWebsiteSection[] = Array.isArray(section.blocks)
+    ? section.blocks
+    : [];
+  const background = /^#[0-9a-fA-F]{6}$/.test(`${section.background}`)
+    ? { '--flex-bg': section.background }
+    : undefined;
+  const justify = pick(
+    section.justify,
+    ['start', 'center', 'end', 'space-between', 'space-around'],
+    'start'
+  );
+  const align = pick(
+    section.align,
+    ['start', 'center', 'end', 'stretch'],
+    'stretch'
+  );
+  return (
+    <section
+      className={`site-flex site-flex-${pick(section.width, ['boxed', 'full'], 'boxed')} site-pad-${pick(section.padding, sizes, 'medium')}`}
+      style={background as any}
+    >
+      <div
+        className={`site-flex-inner site-dir-${pick(section.direction, ['row', 'column'], 'row')} site-justify-${justify} site-align-${align} site-gap-${pick(section.gap, sizes, 'medium')}${section.wrap === false ? ' site-nowrap' : ''}`}
+      >
+        {blocks.map(block => {
+          const Block = SECTIONS[block.type];
+          if (!Block) return null;
+          const basis = BASES.includes(`${block.basis}`)
+            ? ` site-basis-${block.basis.replace('/', '-')}`
+            : '';
+          return (
+            <div key={block.id} className={`site-flex-item${basis}`}>
+              <Block
+                {...props}
+                section={block}
+                articles={props.articlesById?.[block.id]}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
 export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   hero: Hero,
   split: Split,
@@ -369,5 +463,8 @@ export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   image: Image,
   gallery: Gallery,
   contact: Contact,
-  articles: Articles
+  articles: Articles,
+  row: Row,
+  buttons: ButtonsBlock,
+  tile: Tile
 };

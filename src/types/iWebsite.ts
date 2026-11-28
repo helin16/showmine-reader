@@ -9,6 +9,8 @@ export type iWebsiteSeo = {
 export type iWebsiteSection = {
   id: string;
   type: string;
+  // Shared blocks only (SMN-95): the pages it is left out of.
+  hiddenSlugs?: string[];
   [field: string]: any;
 };
 
