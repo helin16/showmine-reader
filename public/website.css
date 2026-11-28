@@ -147,16 +147,25 @@
 }
 .site-page > section,
 .site-page > figure,
-.site-row > section,
-.site-row > figure {
+.site-page > .site-row {
   margin: 24px 0;
 }
 
-/* Two blocks side by side (SMN-94): one column, two equal halves from 1024px of site width. */
+/* Two blocks side by side (SMN-94): one column, two equal halves from 1024px of site width. The row has the block
+   margins; its blocks none, as grid items' margins do not collapse. Full width means the half's width inside a row. */
 .site-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
+  row-gap: 48px;
+}
+.site-page .site-row > * {
+  margin: 0;
+}
+.site-page .site-row > .site-full,
+.site-style-airy .site-page .site-row > .site-full {
+  width: auto;
+  margin-inline: 0;
 }
 @container (min-width: 1024px) {
   .site-row {
@@ -167,6 +176,7 @@
 
 /* Edge to edge of the site (SMN-94): a hero or map across the whole width, with no rounded corners. */
 .site-page .site-full {
+  box-sizing: border-box;
   width: 100cqw;
   margin-inline: calc(50% - 50cqw);
   border-radius: 0;
@@ -728,8 +738,7 @@
 }
 .site-style-airy .site-page > section,
 .site-style-airy .site-page > figure,
-.site-style-airy .site-row > section,
-.site-style-airy .site-row > figure {
+.site-style-airy .site-page > .site-row {
   margin: 48px 0;
   padding: 24px 0;
 }
@@ -877,8 +886,7 @@
   }
   .site-style-airy .site-page > section,
   .site-style-airy .site-page > figure,
-  .site-style-airy .site-row > section,
-  .site-style-airy .site-row > figure {
+  .site-style-airy .site-page > .site-row {
     margin: 96px 0;
     padding: 40px 0;
   }

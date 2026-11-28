@@ -61,6 +61,21 @@ describe('groupSideBySide()', () => {
     );
     expect(main.children[1].tagName).toBe('SECTION');
   });
+
+  test('shared blocks pair only among themselves, as the admin canvas draws them', () => {
+    const website = {
+      ...site([text('p1', true), text('p2', true)]),
+      layout: { sharedAbove: [text('s1', true)], sharedBelow: [] }
+    } as iWebsite;
+    const { container } = render(
+      <Site website={website} page={website.pages[0]} articles={{}} />
+    );
+    const main = container.querySelector('main') as HTMLElement;
+    expect(main.children).toHaveLength(2);
+    expect(main.children[0].tagName).toBe('SECTION');
+    expect(main.children[1]).toHaveClass('site-row');
+    expect(main.children[1].textContent).toBe('p1p2');
+  });
 });
 
 describe('sites without the new fields', () => {
