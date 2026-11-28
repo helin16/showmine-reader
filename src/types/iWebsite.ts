@@ -64,6 +64,8 @@ export type iWebsite = {
     secondaryColor?: string;
     buttonColor?: string;
     contentWidth?: number;
+    // plain (absent) or airy (SMN-93).
+    style?: string;
   };
   // Absent or null: the site shows as before the layout.
   layout?: iWebsiteLayout | null;

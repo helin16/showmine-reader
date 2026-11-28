@@ -598,6 +598,22 @@ describe('website sections', () => {
     expect(root.className).toContain('site-font-modern');
     expect(root.getAttribute('style')).toBeNull();
   });
+
+  test.each([
+    [{ style: 'airy' }, 'site site-font-modern site-style-airy'],
+    [
+      { style: 'airy', fontPair: 'classic' },
+      'site site-font-classic site-style-airy'
+    ],
+    [{ style: 'plain' }, 'site site-font-modern'],
+    [{ style: 'fancy' }, 'site site-font-modern'],
+    [{}, 'site site-font-modern']
+  ])('theme %p gives the classes %p (SMN-93)', (theme, classes) => {
+    const { container } = show([], { theme });
+    expect((container.querySelector('.site') as HTMLElement).className).toBe(
+      classes
+    );
+  });
 });
 
 describe('WebsiteService.getHref()', () => {

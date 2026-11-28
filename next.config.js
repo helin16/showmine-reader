@@ -45,6 +45,14 @@ const nextConfig = {
         { key: 'Access-Control-Allow-Origin', value: '*' },
       ],
     },
+    // The airy style's font (SMN-93): the admin canvas loads it from here too, and browsers ask fonts for CORS.
+    {
+      source: '/fonts/:path*',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        { key: 'Access-Control-Allow-Origin', value: '*' },
+      ],
+    },
   ],
 }
 

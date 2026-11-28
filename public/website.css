@@ -549,3 +549,262 @@
   font-size: 0.9rem;
   text-align: center;
 }
+
+/* The airy style (SMN-93, theme.style "airy"): the look of showmine.com.au, from its own CSS. Nothing above changes
+   for other sites. Inter (SIL Open Font License 1.1), latin subset, served from /fonts with CORS for the admin
+   canvas. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(/fonts/inter-latin.woff2) format("woff2");
+}
+.site.site-style-airy {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-weight: 300;
+  line-height: 1.5;
+  color: #716c80;
+}
+.site-style-airy h1,
+.site-style-airy h2,
+.site-style-airy h3 {
+  margin: 20px 0;
+  font-weight: 300;
+  line-height: 1.22;
+}
+.site-style-airy .site-page h1,
+.site-style-airy .site-page h2 {
+  font-size: 36px;
+}
+.site-style-airy .site-page p {
+  font-size: 18px;
+  line-height: 32px;
+}
+
+/* Width: as showmine.com.au's container, the largest of 640, 768, 1024, 1280 and 1536 px that fits the site (the
+   theme's content width is not used). The header, page and footer read it. */
+.site-style-airy > * {
+  --site-width: 100%;
+}
+@container (min-width: 640px) {
+  .site-style-airy > * {
+    --site-width: 640px;
+  }
+}
+@container (min-width: 768px) {
+  .site-style-airy > * {
+    --site-width: 768px;
+  }
+}
+@container (min-width: 1024px) {
+  .site-style-airy > * {
+    --site-width: 1024px;
+  }
+}
+@container (min-width: 1280px) {
+  .site-style-airy > * {
+    --site-width: 1280px;
+  }
+}
+@container (min-width: 1536px) {
+  .site-style-airy > * {
+    --site-width: 1536px;
+  }
+}
+
+/* Header: a light band across the window, its content as wide as the page. */
+.site-style-airy .site-nav {
+  padding: 16px max(12px, calc((100% - var(--site-width, 960px)) / 2 + 12px));
+  border-bottom: 0;
+  background: rgba(229, 238, 255, 0.45);
+}
+.site-style-airy .site-nav .site-name img {
+  width: 150px;
+  height: auto;
+  max-height: 70px;
+}
+.site-style-airy .site-nav ul {
+  gap: 0 8px;
+}
+.site-style-airy .site-nav ul a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 300;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.site-style-airy .site-nav ul a:hover,
+.site-style-airy .site-nav ul a[aria-current=page] {
+  color: #fb923c;
+}
+.site-style-airy .site-nav ul a[aria-current=page]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--site-primary);
+}
+
+/* Page: 24px sides, blocks far apart. */
+.site-style-airy .site-page {
+  padding: 0 24px 48px;
+}
+.site-style-airy .site-page > section,
+.site-style-airy .site-page > figure {
+  margin: 48px 0;
+  padding: 24px 0;
+}
+
+/* Buttons: pills, uppercase. */
+.site-style-airy .site-button {
+  margin: 16px 0;
+  padding: 16px 32px;
+  border-radius: 9999px;
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+.site-style-airy .site-buttons {
+  gap: 0 16px;
+}
+.site-style-airy .site-page .site-note {
+  font-size: 14px;
+  line-height: 20px;
+  color: inherit;
+}
+
+.site-style-airy .site-hero {
+  padding: 48px 0;
+  background-color: transparent;
+}
+.site-style-airy .site-split {
+  gap: 24px 64px;
+}
+.site-style-airy .site-split img {
+  border-radius: 0;
+}
+
+/* Card grids: the intro half the page wide; boxed cards white, 320px, with a large soft shadow, centred in rows. */
+.site-style-airy .site-page .site-cards-intro {
+  font-size: 18px;
+  line-height: 32px;
+  max-width: 50%;
+  min-width: min(100%, 320px);
+}
+.site-style-airy .site-cards.boxed ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 40px;
+}
+.site-style-airy .site-cards.boxed li {
+  width: 320px;
+  max-width: 100%;
+  margin: 40px 0;
+}
+.site-style-airy .site-cards.boxed .site-card {
+  gap: 24px;
+  padding: 32px;
+  box-shadow: 0 25px 50px -12px rgba(148, 163, 184, 0.5);
+}
+.site-style-airy .site-cards.boxed .site-card img {
+  flex-basis: 50px;
+  width: 50px;
+  height: 50px;
+}
+.site-style-airy .site-cards.boxed .site-card h3 {
+  color: inherit;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  margin: 0;
+}
+.site-style-airy .site-page .site-cards.boxed .site-card p {
+  margin: 0;
+  line-height: 24px;
+}
+.site-style-airy .site-page .site-card p {
+  color: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+}
+/* Plain cards: the title in the heading colour, a white box on hover. */
+.site-style-airy .site-cards:not(.boxed) .site-card {
+  flex-direction: column;
+  padding: 28px;
+  border-radius: 6px;
+}
+.site-style-airy .site-cards:not(.boxed) .site-card:hover {
+  background: #fff;
+}
+.site-style-airy .site-cards:not(.boxed) .site-card h3 {
+  margin: 0 0 16px;
+  font-size: 24px;
+}
+.site-style-airy .site-cards:not(.boxed) .site-card p {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.site-style-airy .site-plan {
+  box-shadow: 0 25px 50px -12px rgba(148, 163, 184, 0.5);
+}
+
+/* Footer: no rule, titles 24px light, the copyright on a pale band across the window. */
+.site-style-airy .site-footer {
+  border-top: 0;
+}
+.site-style-airy .site-footer-columns {
+  gap: 32px;
+  padding: 48px 24px 96px;
+}
+.site-style-airy .site-footer h2 {
+  margin: 8px 0 24px;
+  color: inherit;
+  font-size: 24px;
+  font-weight: 300;
+}
+.site-style-airy .site-footer p {
+  line-height: 32px;
+}
+.site-style-airy .site-footer-image img {
+  max-width: 240px;
+}
+.site-style-airy .site-footer .site-copyright {
+  padding: 24px 16px;
+  border-top: 0;
+  background: #dbeafe;
+  color: inherit;
+  font-size: 16px;
+}
+
+@container (min-width: 1024px) {
+  .site-style-airy .site-page h1,
+  .site-style-airy .site-page h2 {
+    font-size: 45px;
+  }
+  .site-style-airy .site-page p {
+    font-size: 20px;
+    line-height: 36px;
+  }
+  .site-style-airy .site-page > section,
+  .site-style-airy .site-page > figure {
+    margin: 96px 0;
+    padding: 40px 0;
+  }
+  .site-style-airy .site-hero {
+    padding: 96px 0;
+  }
+  /* Text a third, the picture two thirds, as most of showmine.com.au's bands. */
+  .site-style-airy .site-split.image-left {
+    grid-template-columns: 2fr 1fr;
+  }
+  .site-style-airy .site-split.image-right {
+    grid-template-columns: 1fr 2fr;
+  }
+}

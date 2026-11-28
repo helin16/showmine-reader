@@ -65,11 +65,16 @@ export const getSections = (website: iWebsite, page: iWebsitePage) => [
   ...(website.layout?.sharedBelow || [])
 ];
 
+// The site's classes: its font pair, and the airy style (SMN-93) when chosen; unknown values fall back to the plain look.
+export const getSiteClass = (theme: iWebsite['theme'] = {}) =>
+  `site site-font-${FONT_PAIRS.includes(`${theme.fontPair}`) ? theme.fontPair : 'modern'}${
+    theme.style === 'airy' ? ' site-style-airy' : ''
+  }`;
+
 const Site = ({ website, page, preview, articles }: iSite) => {
-  const { fontPair } = website.theme || {};
   return (
     <div
-      className={`site site-font-${FONT_PAIRS.includes(`${fontPair}`) ? fontPair : 'modern'}`}
+      className={getSiteClass(website.theme)}
       style={getThemeStyle(website.theme)}
     >
       {preview || website.isPreview ? (
