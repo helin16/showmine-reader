@@ -1067,28 +1067,37 @@
   }
 }
 
-/* SMN-96. Row (flex container), Buttons and Tile blocks. A top-level row runs edge to edge as .site-full does; its
-   content is the page's width (boxed) or the whole width (full). The selectors start with .site so the airy page
-   margins and padding (0,2,1) do not undo them. Rows inside a row take the item's width and have no padding. */
+/* SMN-96. Row (flex container), Buttons and Tile blocks. Every row is a top-level row by default: edge to edge, its
+   content the page's width (boxed) or the whole width (full), no block margins. A row inside a row (a block of a
+   .site-flex-item, as the admin canvas draws it too) is overridden below. No selector depends on .site-page > because
+   the canvas wraps each top-level block. The selectors start with .site .site-page so the airy page margins and
+   padding (0,2,1) do not undo them. */
 .site-flex {
   background: var(--flex-bg, transparent);
 }
-.site .site-page > .site-flex {
+.site .site-page .site-flex {
   box-sizing: border-box;
   width: 100cqw;
-  margin-inline: calc(50% - 50cqw);
+  margin: 0 calc(50% - 50cqw);
 }
-.site .site-page > .site-flex.site-pad-none {
+.site .site-page .site-flex.site-pad-none {
   padding-block: 0;
 }
-.site .site-page > .site-flex.site-pad-small {
+.site .site-page .site-flex.site-pad-small {
   padding-block: 24px;
 }
-.site .site-page > .site-flex.site-pad-medium {
+.site .site-page .site-flex.site-pad-medium {
   padding-block: 48px;
 }
-.site .site-page > .site-flex.site-pad-large {
+.site .site-page .site-flex.site-pad-large {
   padding-block: 96px;
+}
+/* A row inside a row, or beside another block: the item's width, no margins, no padding. */
+.site .site-page .site-flex-item > .site-flex[class],
+.site .site-page .site-row > .site-flex[class] {
+  width: auto;
+  margin: 0;
+  padding-block: 0;
 }
 .site-flex-inner {
   display: flex;
@@ -1145,19 +1154,24 @@
   --flex-gap: 48px;
 }
 /* The content's width: the page's content width plus the side padding, so the content lines up with the page's blocks. */
-.site-page > .site-flex-boxed > .site-flex-inner {
+.site-flex-boxed > .site-flex-inner {
   box-sizing: border-box;
   max-width: calc(var(--site-width, 960px) + 32px);
   margin-inline: auto;
   padding-inline: 16px;
 }
-.site-style-airy .site-page > .site-flex-boxed > .site-flex-inner {
+.site-style-airy .site-flex-boxed > .site-flex-inner {
   max-width: calc(var(--site-width, 960px) + 48px);
   padding-inline: 24px;
 }
-.site-page > .site-flex-full > .site-flex-inner {
+.site-flex-full > .site-flex-inner {
   box-sizing: border-box;
   padding-inline: 24px;
+}
+.site .site-flex-item .site-flex > .site-flex-inner {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
 }
 
 .site-flex-item {
@@ -1170,9 +1184,6 @@
 .site-style-airy .site-page .site-flex-item > .site-full {
   width: auto;
   margin-inline: 0;
-}
-.site-flex-item > .site-flex {
-  padding-block: 0;
 }
 .site-flex-item > .site-tile {
   height: 100%;
@@ -1204,7 +1215,7 @@
 .site-flex-item.site-basis-full {
   flex: 0 0 100%;
 }
-.site-flex .site-buttons {
+.site-flex .site-buttons-block .site-buttons {
   justify-content: flex-start;
 }
 
@@ -1221,6 +1232,12 @@
   color: inherit;
   text-decoration: none;
 }
+.site a.site-tile {
+  color: inherit;
+}
+.site .site-page .site-tile {
+  padding: 24px 32px;
+}
 .site-tile-icon {
   flex: 0 0 48px;
   width: 48px;
@@ -1231,6 +1248,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 .site .site-tile .site-tile-text {
   margin: 4px 0 0;
@@ -1248,7 +1266,8 @@
 
 /* Under 768px of site width every block in a row takes the full width. */
 @container (max-width: 767px) {
-  .site-flex-inner {
+  .site-flex-inner,
+  .site-flex-inner.site-nowrap {
     flex-wrap: wrap;
   }
   .site-flex-inner.site-dir-row > .site-flex-item {

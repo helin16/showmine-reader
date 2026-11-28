@@ -225,9 +225,9 @@ describe('buttons block', () => {
     );
   });
 
-  test('a buttons block with nothing shows an empty wrapper only', () => {
+  test('a buttons block with nothing shows nothing', () => {
     const { container } = show([{ id: 'b', type: 'buttons' }]);
-    expect(container.querySelector('.site-buttons')).toBeNull();
+    expect(container.querySelector('.site-buttons-block')).toBeNull();
   });
 });
 

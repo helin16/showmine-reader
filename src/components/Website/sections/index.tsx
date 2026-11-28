@@ -361,11 +361,12 @@ export const Articles = ({ section, articles }: iSection) => {
 };
 
 // Buttons on their own (SMN-96): the band's buttons as a block.
-export const ButtonsBlock = (props: iSection) => (
-  <section className={'site-buttons-block'}>
-    <Buttons {...props} />
-  </section>
-);
+export const ButtonsBlock = (props: iSection) => {
+  const buttons = Buttons(props);
+  return buttons ? (
+    <section className={'site-buttons-block'}>{buttons}</section>
+  ) : null;
+};
 
 // A small card (SMN-96): an icon, a title and a line of text; a link makes the whole card a link.
 export const Tile = ({ section, website, preview }: iSection) => {
