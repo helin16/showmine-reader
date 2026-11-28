@@ -41,7 +41,7 @@ export const Buttons = ({ section, website, preview }: iSection) => {
 
 export const Hero = ({ section, website, preview }: iSection) => (
   <section
-    className={`site-hero${section.imageUrl ? ' with-image' : ''}`}
+    className={`site-hero${section.imageUrl ? ' with-image' : ''}${section.fullWidth === true ? ' site-full' : ''}${section.darkText === true ? ' dark-text' : ''}`}
     style={
       section.imageUrl
         ? { backgroundImage: `url("${encodeURI(section.imageUrl)}")` }
@@ -204,22 +204,31 @@ export const MapBlock = ({ section }: iSection) => {
     isHttps(section.mapUrl) && isHttps(section.chinaMapUrl)
       ? section.chinaMapUrl
       : null;
+  // SMN-94: without a China link, a picture can stand in for it (the map site's own picture of the place).
+  const picture = !china && section.imageUrl ? `${section.imageUrl}` : null;
+  const switchable = !!(china || picture);
   const [showChina, setShowChina] = useState<boolean | null>(
-    china ? null : false
+    switchable ? null : false
   );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the visitor's browser is only known after hydration
-    if (china) setShowChina(prefersChinaMap());
-  }, [china]);
+    if (switchable) setShowChina(prefersChinaMap());
+  }, [switchable]);
 
   if (!isHttps(section.mapUrl)) return null;
   return (
     <section
-      className={`site-map-block ${MAP_HEIGHTS.includes(`${section.height}`) ? section.height : 'medium'}`}
+      className={`site-map-block ${MAP_HEIGHTS.includes(`${section.height}`) ? section.height : 'medium'}${section.fullWidth === true ? ' site-full' : ''}`}
     >
       {showChina === null ? (
         <div className={'site-map'} aria-hidden={'true'} />
+      ) : showChina && picture ? (
+        <img
+          className={'site-map site-map-picture'}
+          src={picture}
+          alt={section.imageAlt || ''}
+        />
       ) : (
         <iframe
           className={'site-map'}
@@ -230,7 +239,7 @@ export const MapBlock = ({ section }: iSection) => {
           referrerPolicy={'no-referrer'}
         />
       )}
-      {china && showChina !== null ? (
+      {switchable && showChina !== null ? (
         <button
           type={'button'}
           className={'site-map-switch'}
@@ -311,21 +320,43 @@ export const Contact = ({ section, website }: iSection) => {
   );
 };
 
-export const Articles = ({ articles }: iSection) =>
-  articles && articles.length > 0 ? (
-    <section className={'site-articles'}>
-      <ul>
-        {articles.map(item => (
-          <li key={item.id}>
-            <a href={`/item/${item.id}`}>
-              <img src={ItemService.getCoverImageUrl(item)} alt={''} />
-              <span>{item.title}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+// layout "featured" (SMN-94): the first post large, the others as a list of titles beside it.
+export const Articles = ({ section, articles }: iSection) => {
+  if (!articles || articles.length === 0) return null;
+  const featured = section.layout === 'featured';
+  const link = (item: iItem, withCover: boolean) => (
+    <a href={`/item/${item.id}`}>
+      {withCover ? (
+        <img src={ItemService.getCoverImageUrl(item)} alt={''} />
+      ) : null}
+      <span>{item.title}</span>
+    </a>
+  );
+  if (!featured) {
+    return (
+      <section className={'site-articles'}>
+        <ul>
+          {articles.map(item => (
+            <li key={item.id}>{link(item, true)}</li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+  const [first, ...rest] = articles;
+  return (
+    <section className={'site-articles featured'}>
+      <div className={'site-featured-post'}>{link(first, true)}</div>
+      {rest.length > 0 ? (
+        <ul>
+          {rest.map(item => (
+            <li key={item.id}>{link(item, false)}</li>
+          ))}
+        </ul>
+      ) : null}
     </section>
-  ) : null;
+  );
+};
 
 export const SECTIONS: { [type: string]: (props: iSection) => any } = {
   hero: Hero,

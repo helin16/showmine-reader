@@ -1,5 +1,5 @@
 import iItem from '@/types/iItem';
-import { iWebsite, iWebsitePage } from '@/types/iWebsite';
+import { iWebsite, iWebsitePage, iWebsiteSection } from '@/types/iWebsite';
 import Nav from '@/components/Website/Nav';
 import { SECTIONS } from '@/components/Website/sections';
 import Footer from '@/components/Website/Footer';
@@ -71,6 +71,23 @@ export const getSiteClass = (theme: iWebsite['theme'] = {}) =>
     theme.style === 'airy' ? ' site-style-airy' : ''
   }`;
 
+// Side by side (SMN-94): two blocks in a row that both have sideBySide form one pair; a lone one, or the third of three,
+// renders as usual. Reading left to right, so three in a row pair the first two. The admin canvas uses this too.
+export const groupSideBySide = (
+  sections: iWebsiteSection[]
+): iWebsiteSection[][] => {
+  const groups: iWebsiteSection[][] = [];
+  for (let i = 0; i < sections.length; i++) {
+    if (sections[i].sideBySide && sections[i + 1]?.sideBySide) {
+      groups.push([sections[i], sections[i + 1]]);
+      i++;
+    } else {
+      groups.push([sections[i]]);
+    }
+  }
+  return groups;
+};
+
 const Site = ({ website, page, preview, articles }: iSite) => {
   return (
     <div
@@ -82,18 +99,27 @@ const Site = ({ website, page, preview, articles }: iSite) => {
       ) : null}
       <Nav website={website} currentSlug={page.slug} preview={preview} />
       <main className={'site-page'}>
-        {getSections(website, page).map(section => {
-          const Section = SECTIONS[section.type];
-          return Section ? (
-            <Section
-              key={section.id}
-              section={section}
-              website={website}
-              preview={preview}
-              articles={articles[section.id]}
-              pageSlug={page.slug}
-            />
-          ) : null;
+        {groupSideBySide(getSections(website, page)).map(group => {
+          const blocks = group.map(section => {
+            const Section = SECTIONS[section.type];
+            return Section ? (
+              <Section
+                key={section.id}
+                section={section}
+                website={website}
+                preview={preview}
+                articles={articles[section.id]}
+                pageSlug={page.slug}
+              />
+            ) : null;
+          });
+          return group.length === 2 ? (
+            <div key={group[0].id} className={'site-row'}>
+              {blocks}
+            </div>
+          ) : (
+            blocks
+          );
         })}
       </main>
       <Footer website={website} preview={preview} />

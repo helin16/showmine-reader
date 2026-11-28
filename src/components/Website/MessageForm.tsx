@@ -118,6 +118,7 @@ const MessageForm = ({ section, website, preview, pageSlug }: iMessageForm) => {
                   id={id(name)}
                   name={name}
                   required
+                  placeholder={`${label}*`}
                   maxLength={max}
                   rows={5}
                   value={values[name]}
@@ -135,6 +136,7 @@ const MessageForm = ({ section, website, preview, pageSlug }: iMessageForm) => {
                   name={name}
                   type={type}
                   required
+                  placeholder={`${label}*`}
                   maxLength={max}
                   autoComplete={autoComplete}
                   value={values[name]}
