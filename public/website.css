@@ -672,6 +672,17 @@
 .site-style-airy .site-buttons {
   gap: 0 16px;
 }
+/* Keep the places other blocks give their buttons: plans line theirs up at the bottom; the footer's sits on its line. */
+.site-style-airy .site-plan .site-button {
+  margin: auto 0 0;
+}
+.site-style-airy .site-footer .site-button {
+  margin: 0;
+}
+.site-style-airy .site-form button.site-button {
+  font-size: 14px;
+  line-height: 20px;
+}
 .site-style-airy .site-page .site-note {
   font-size: 14px;
   line-height: 20px;
@@ -804,11 +815,11 @@
   .site-style-airy .site-cards.boxed li {
     margin: 40px 0;
   }
-  /* Text a third, the picture two thirds, as most of showmine.com.au's bands. */
-  .site-style-airy .site-split.image-left {
+  /* Text a third, the picture two thirds, as most of showmine.com.au's bands; without a picture, as before. */
+  .site-style-airy .site-split.image-left:has(> img) {
     grid-template-columns: 2fr 1fr;
   }
-  .site-style-airy .site-split.image-right {
+  .site-style-airy .site-split.image-right:has(> img) {
     grid-template-columns: 1fr 2fr;
   }
 }
