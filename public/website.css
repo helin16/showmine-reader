@@ -912,10 +912,12 @@
 }
 
 /* Plan cards as on showmine.com.au/pricing: the price (large, light) with its period under it on the left; the name
-   (bold) and the "- " feature lines on the right. One plan per line; stacked on a phone, price first. */
+   (bold) and the "- " feature lines on the right. Cards 300px or wider side by side (three across on a desktop, as
+   the original), one per line on a phone. */
 .site-style-airy .site-pricing > ul {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   justify-content: stretch;
+  gap: 40px;
 }
 .site-style-airy .site-plan {
   display: grid;
@@ -958,6 +960,9 @@
   border-top: 0;
   font-size: 16px;
 }
+.site-style-airy .site-plan ul li::before {
+  content: "- ";
+}
 .site-style-airy .site-plan .site-button {
   margin: 16px 0 0;
   align-self: start;
@@ -965,8 +970,8 @@
 }
 @container (min-width: 560px) {
   .site-style-airy .site-plan {
-    grid-template-columns: minmax(120px, 30%) minmax(0, 1fr);
-    gap: 0 32px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 24px;
   }
   .site-style-airy .site-plan .site-price {
     order: 0;
@@ -1022,4 +1027,34 @@
 }
 .site-style-airy .site-articles.featured ul span {
   font-size: 18px;
+}
+
+/* SMN-94, after the browser check beside showmine.com.au: a full-width block at the top of a page starts right
+   under the header; the banner is taller with its picture's bottom in view; a map runs without band padding. */
+.site-style-airy .site-page > .site-full:first-child {
+  margin-top: 0;
+}
+.site-style-airy .site-page .site-hero.site-full {
+  padding-block: 96px;
+  background-position: center bottom;
+}
+.site-style-airy .site-page .site-map-block.site-full {
+  padding-block: 0;
+}
+/* The form's heading and intro line up with its fields, on the left, as the original's. */
+.site-style-airy .site-form > h2,
+.site-style-airy .site-page .site-form > .site-cards-intro {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: left;
+}
+/* Text beside another block is a size smaller, as the original's two columns. */
+.site-style-airy .site-page .site-row p {
+  font-size: 18px;
+  line-height: 32px;
+}
+@container (min-width: 1024px) {
+  .site-style-airy .site-page .site-hero.site-full {
+    padding-block: 120px;
+  }
 }
